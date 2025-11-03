@@ -42,10 +42,11 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
       );
     }
 
-    // Populate user and game data
-    const populatedUserGame = await userGame
-      .populate("user", "username")
-      .populate("game", "title genre platform");
+    // Show user and game in response
+    const populatedUserGame = await userGame.populate([
+      { path: "user", select: "username" },
+      { path: "game", select: "title genres platforms" }
+    ]);     
 
     return NextResponse.json({
       success: true,
@@ -153,9 +154,10 @@ export const PATCH = async (request: NextRequest, context: { params: Promise<Par
     }
 
     // Show user and game in response
-    const populatedGame = await updatedGame
-      .populate("user", "username")
-      .populate("game", "title");
+    const populatedGame = await updatedGame.populate([
+      { path: "user", select: "username" },
+      { path: "game", select: "title genres platforms" }
+    ]); 
 
     return NextResponse.json({
       success: true,

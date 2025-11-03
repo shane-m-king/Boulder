@@ -19,8 +19,6 @@ export const GET = async (request: NextRequest) => {
     // Filters
     const genre = searchParams.get("genre")?.trim();
     const platform = searchParams.get("platform")?.trim();
-    const minRating = searchParams.get("minRating")?.trim();
-    const maxRating = searchParams.get("maxRating")?.trim();
 
     const filter: Record<string, any> = {};
 
@@ -28,15 +26,10 @@ export const GET = async (request: NextRequest) => {
       filter.title = { $regex: search, $options: "i" };
     }
     if (genre) {
-      filter.genre = { $regex: genre, $options: "i" };
+      filter.genres = { $regex: genre, $options: "i" };
     }
     if (platform) {
-      filter.platform = { $regex: platform, $options: "i" };
-    }
-    if (minRating || maxRating) {
-      filter.rating = {};
-      if (minRating) filter.rating.$gte = Number(minRating);
-      if (maxRating) filter.rating.$lte = Number(maxRating);
+      filter.platforms = { $regex: platform, $options: "i" };
     }
 
     // Sort results

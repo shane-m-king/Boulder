@@ -94,9 +94,10 @@ export const POST = async (request: NextRequest) => {
     });
 
     // Show user and game in response
-    const populatedReview = await newReview
-      .populate("user", "username")
-      .populate("game", "title");
+    const populatedReview = await newReview.populate([
+      { path: "user", select: "username" },
+      { path: "game", select: "title" }
+    ]);
 
     return NextResponse.json(
       {
