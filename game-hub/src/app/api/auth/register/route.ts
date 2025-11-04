@@ -8,11 +8,11 @@ import { z } from "zod";
 const registerSchema = z.object({
   email: z.email({ message: "Invalid email address" }),
   username: z.string()
-    .min(3, { message: "Username must be at least 3 characters" })
-    .max(20, { message: "Username must be at most 20 characters" }),
+    .min(3, { message: "Username minimum 3 characters" })
+    .max(20, { message: "Username maximum 20 characters" }),
   password: z.string()
-    .min(6, { message: "Password must be at least 6 characters" })
-    .max(30, { message: "Password must be at most 30 characters" })
+    .min(6, { message: "Password minimum 6 characters" })
+    .max(30, { message: "Password maximum 30 characters" })
 });
 
 export const POST = async (request: NextRequest) => {
@@ -58,7 +58,7 @@ export const POST = async (request: NextRequest) => {
   } catch (error: any) {
     // Zod validation errors
     if (error instanceof z.ZodError) {
-      const errors = error.issues.map(issue => issue.message).join(", ");
+      const errors = error.issues.map(issue => issue.message).join("\n");
       console.error("Error registering user: ", errors);
       return NextResponse.json({ success: false, error: errors }, { status: 400 });
     }

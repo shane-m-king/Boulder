@@ -19,7 +19,7 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    const trimmedUsername = username.trim();
+    const trimmedUsername = username.trim().toLowerCase();
 
     // Check if username already exists
     const user = await User.findOne({ username: trimmedUsername });
