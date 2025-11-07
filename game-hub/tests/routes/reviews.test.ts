@@ -154,7 +154,7 @@ describe("/api/reviews Route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(400);
-    expect(data.error).toMatch(/between 1 and 10/i);
+    expect(data.error).toMatch(/must be 0-10/i);
   });
 
   it("fails when title is too long", async () => {
@@ -174,7 +174,7 @@ describe("/api/reviews Route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(400);
-    expect(data.error).toMatch(/title must be 40/i);
+    expect(data.error).toMatch(/title maximum 40 characters/i);
   });
 
   it("fails when review body is too long", async () => {
@@ -194,7 +194,7 @@ describe("/api/reviews Route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(400);
-    expect(data.error).toMatch(/body must be 400/i);
+    expect(data.error).toMatch(/body maximum 400 characters/i);
   });
 
   it("prevents duplicate reviews by same user on same game", async () => {

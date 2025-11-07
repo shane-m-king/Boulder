@@ -3,19 +3,21 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // If loading completes and no user is found, redirect to login
+    // Redirect to login if no user found
     if (!loading && !user) {
       router.push("/login");
+      toast.error("Must be logged in");
     }
   }, [user, loading, router]);
 
@@ -35,3 +37,5 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   // If not authenticated, render nothing while redirecting
   return null;
 }
+
+export default ProtectedRoute;

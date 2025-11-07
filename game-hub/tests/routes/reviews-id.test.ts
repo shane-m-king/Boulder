@@ -156,7 +156,7 @@ describe("/api/reviews/[id] Route", () => {
     const data = await res.json();
 
     expect(res.status).toBe(400);
-    expect(data.error).toMatch(/between 1 and 10/);
+    expect(data.error).toMatch(/between 0 and 10/);
   });
 
   // --DELETE--

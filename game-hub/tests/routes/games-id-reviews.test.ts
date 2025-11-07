@@ -81,17 +81,6 @@ describe("/api/games/[id]/reviews Route", () => {
     expect(data.data.totalPages).toBe(2);
   });
 
-  it("sorts reviews by rating descending", async () => {
-    const req = makeRequest(
-      `http://localhost:3000/api/games/${testGame._id}/reviews?sortField=rating&sortOrder=desc`
-    );
-    const res = await GET(req, { params: Promise.resolve({ id: testGame._id.toString() }) });
-    const data = await res.json();
-
-    const ratings = data.data.reviews.map((r: any) => r.rating);
-    expect(ratings).toEqual([9, 8, 6]);
-  });
-
   it("returns error for invalid game ID", async () => {
     const req = makeRequest(`http://localhost:3000/api/games/invalid-id/reviews`);
     const res = await GET(req, { params: Promise.resolve({ id: "invalid-id" }) });

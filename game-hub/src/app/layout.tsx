@@ -36,7 +36,7 @@ export default function RootLayout({
         <AuthProvider>
           <div className="flex min-h-screen flex-col bg-gradient-to-br from-boulder-dark via-boulder-mid to-boulder-dark">
             <Navbar />
-            <main className="flex flex-1 items-center justify-center w-full">
+            <main className="flex flex-1 justify-center w-full">
               <div className="container mx-auto px-4">{children}</div>
             </main>
           </div>
@@ -44,7 +44,7 @@ export default function RootLayout({
           <Toaster
             position="bottom-center"
             toastOptions={{
-              duration: 3500,
+              duration: 3000,
               style: {
                 fontFamily: "Inter, sans-serif",
                 fontWeight: 500,

@@ -18,7 +18,7 @@ const userGameSchema = new Schema(
       type: String,
       enum: STATUSES,
       required: true,
-      default: "Unowned",
+      default: "Not Owned",
     },
     notes: {
       type: String,

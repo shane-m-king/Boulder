@@ -101,9 +101,9 @@ describe("/api/users/[id]/games/[gameId] Route", () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.data.game.status).toBe("Owned");
-    expect(data.data.game.user.username).toBe("userOne");
-    expect(data.data.game.game.title).toBe("Hollow Knight");
+    expect(data.data.userGame.status).toBe("Owned");
+    expect(data.data.userGame.user.username).toBe("userOne");
+    expect(data.data.userGame.game.title).toBe("Hollow Knight");
   });
 
   it("returns 404 if game not found in user profile", async () => {
@@ -179,8 +179,8 @@ describe("/api/users/[id]/games/[gameId] Route", () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.data.game.status).toBe("Wishlisted");
-    expect(data.data.game.notes).toBe("Revisiting soon");
+    expect(data.data.userGame.status).toBe("Wishlisted");
+    expect(data.data.userGame.notes).toBe("Revisiting soon");
   });
 
   it("rejects unauthorized PATCH from another user", async () => {

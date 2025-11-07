@@ -14,7 +14,7 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
 
     const params = await context.params;
 
-    // // Check if [id] is valid ObjectId
+    // Check if [id] is valid ObjectId
     const idCheckFailed = invalidId(params.id);
     if (idCheckFailed) return idCheckFailed;
 
@@ -34,7 +34,7 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
     const statusFilter = searchParams.get("status");
 
     // Sort results
-    const sortField = searchParams.get("sortField") || "createdAt";
+    const sortField = searchParams.get("sortField") || "updatedAt";
     const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
     const sort: Record<string, 1 | -1> = { [sortField]: sortOrder };
 
@@ -131,7 +131,7 @@ export const POST = async (request: NextRequest, context: { params: Promise<Para
     const newUserGame = await UserGame.create({
       user: params.id,
       game,
-      status: status || "Unowned",
+      status: status || "Not Owned",
       notes: notes?.trim() || "",
     });
 
@@ -141,7 +141,7 @@ export const POST = async (request: NextRequest, context: { params: Promise<Para
       success: true,
       message: "Game successfully added to user profile",
       data: {
-        game: populatedUserGame,
+        userGame: populatedUserGame,
       }
     }, { status: 201 });
   } catch (error: any) {

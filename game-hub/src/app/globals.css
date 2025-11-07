@@ -97,6 +97,30 @@ body {
   animation: toast-exit 0.3s ease forwards;
 }
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes goldPulse {
+  0%, 100% {
+    box-shadow: 0 0 0px rgba(255, 215, 0, 0.3);
+    border-color: rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    border-color: rgba(255, 215, 0, 0.6);
+  }
+}
+
+.animate-goldPulse {
+  animation: goldPulse 0.8s ease-in-out;
+}
+
 
 /* === Autofill styling fix (cross-browser, Boulder theme) === */
 input:-webkit-autofill,

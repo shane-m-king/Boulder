@@ -1,13 +1,32 @@
 "use client";
 
-const ProfilePage = () => {
-    return (
-        <div>
-            <h1>PROFILE</h1>
-            <hr />
-            <p>Profile Page</p>        
-        </div>
-    )
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+
+export const ProfileRedirectPage = () => {
+  const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // Redirect to users profile
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        router.replace(`/profile/${user.id}`);
+      } else {
+        router.replace("/login");
+      }
+    }
+  }, [user, loading, router]);
+
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        Redirecting...
+      </div>
+    </ProtectedRoute>
+  );
 }
 
-export default ProfilePage;
+export default ProfileRedirectPage;

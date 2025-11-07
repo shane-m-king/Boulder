@@ -219,7 +219,7 @@ describe("/api/users/[id]/games Route", () => {
 
     expect(res.status).toBe(201);
     expect(data.success).toBe(true);
-    expect(data.data.game.game.title).toBe("Hollow Knight");
+    expect(data.data.userGame.game.title).toBe("Hollow Knight");
   });
 
   it("prevents duplicate game entries", async () => {

@@ -25,7 +25,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      router.push("/profile");
+      router.push(`/profile/${user.id}`);
     }
   }, [user, loading]);
 

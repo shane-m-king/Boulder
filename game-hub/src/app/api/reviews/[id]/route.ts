@@ -90,10 +90,10 @@ export const PATCH = async (request: NextRequest, context: { params: Promise<Par
     // Validate and set rating
     if (body.rating !== undefined) {
       const rating = body.rating;
-      if (rating < 1 || rating > 10) {
+      if (rating < 0 || rating > 10) {
         console.error("Invalid rating");
         return NextResponse.json(
-          { success: false, error: "Rating must be between 1 and 10" },
+          { success: false, error: "Rating must be between 0 and 10" },
           { status: 400 }
         );
       }

@@ -97,7 +97,7 @@ describe("/api/auth/register Route", () => {
 
     expect(res.status).toBe(400);
     expect(data.success).toBe(false);
-    expect(data.error).toMatch(/Username must be at most 20 characters/);
+    expect(data.error).toMatch(/Username maximum 20 characters/);
   });
 
   it("rejects too short password", async () => {
@@ -112,6 +112,6 @@ describe("/api/auth/register Route", () => {
 
     expect(res.status).toBe(400);
     expect(data.success).toBe(false);
-    expect(data.error).toMatch(/Password must be at least 6 characters/);
+    expect(data.error).toMatch(/Password minimum 6 characters/);
   });
 });

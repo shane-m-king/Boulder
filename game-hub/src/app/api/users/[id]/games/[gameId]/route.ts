@@ -13,7 +13,6 @@ interface Params {
 export const GET = async (request: NextRequest, context: { params: Promise<Params> }) => {
   try {
     await connect();
-
     const params = await context.params;
 
     // Check if [id] is valid ObjectId
@@ -45,14 +44,14 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
     // Show user and game in response
     const populatedUserGame = await userGame.populate([
       { path: "user", select: "username" },
-      { path: "game", select: "title genres platforms" }
+      { path: "game", select: "title genres platforms thumbnailUrl" }
     ]);     
 
     return NextResponse.json({
       success: true,
       message: "Game retrieved successfully",
       data: {
-        game: populatedUserGame
+        userGame: populatedUserGame
       },
     }, { status: 200 });
 
@@ -163,7 +162,7 @@ export const PATCH = async (request: NextRequest, context: { params: Promise<Par
       success: true,
       message: "Game updated successfully",
       data: {
-        game: populatedGame,
+        userGame: populatedGame,
       }
     }, { status: 200 });
 

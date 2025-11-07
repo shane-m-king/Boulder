@@ -31,10 +31,10 @@ export const POST = async (request: NextRequest) => {
     const { game, rating, title, reviewBody } = body;
 
     // Validate fields
-    if (!game || !rating || !title || !reviewBody) {
+    if (!game || !title || !reviewBody) {
       console.error("Missing review fields");
       return NextResponse.json(
-        { success: false, error: "One or more review fields missing." },
+        { success: false, error: "Review fields missing." },
         { status: 400 }
       );
     }
@@ -44,10 +44,10 @@ export const POST = async (request: NextRequest) => {
     if (idCheckFailed) return idCheckFailed;
 
     // Ensure rating is within range
-    if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+    if (!Number.isInteger(rating) || rating < 0 || rating > 10) {
       console.error("Invalid rating");
       return NextResponse.json(
-        { success: false, error: "Rating must be an integer between 1 and 10." },
+        { success: false, error: "Rating must be 0-10." },
         { status: 400 }
       );
     }
@@ -56,7 +56,7 @@ export const POST = async (request: NextRequest) => {
     if (title.length > 40) {
       console.error("Review title too long");
       return NextResponse.json(
-        { success: false, error: "Review title must be 40 characters or less" },
+        { success: false, error: "Review title maximum 40 characters" },
         { status: 400 }
       );
     }
@@ -65,7 +65,7 @@ export const POST = async (request: NextRequest) => {
     if (reviewBody.length > 400) {
       console.error("Review body too long");
       return NextResponse.json(
-        { success: false, error: "Review body must be 400 characters or less" },
+        { success: false, error: "Review body maximum 400 characters" },
         { status: 400 }
       );
     }
@@ -79,7 +79,7 @@ export const POST = async (request: NextRequest) => {
     if (existingReview) {
       console.error("User has already reviewed this game");
       return NextResponse.json(
-        { success: false, error: "User has already reviewed this game." },
+        { success: false, error: "User already reviewed this game." },
         { status: 409 }
       );
     }
