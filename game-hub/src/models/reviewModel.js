@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 const { Schema, models, model, Types } = mongoose;
+import "./userModel";
+import "./gameModel";
 
 mongoose.set("strictQuery", true);
 

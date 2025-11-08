@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 const { Schema, models, model, Types } = mongoose;
 import { STATUSES } from "@/constants/statuses";
+import "./userModel";
+import "./gameModel";
 
 mongoose.set("strictQuery", true);
 
