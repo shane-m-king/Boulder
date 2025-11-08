@@ -36,7 +36,7 @@ const Navbar = () => {
               </Link>
               <button
                 onClick={logout}
-                className="bg-boulder-gold text-boulder-dark font-semibold rounded-md px-3 py-1 hover:bg-boulder-accent hover:shadow-lg transition-all"
+                className="bg-boulder-gold text-boulder-dark font-semibold rounded-md px-3 py-1 hover:bg-boulder-accent hover:shadow-lg transition-all cursor-pointer"
               >
                 Logout
               </button>
@@ -45,7 +45,7 @@ const Navbar = () => {
             <>
               <Link
                 href="/login"
-                className="hover:text-boulder-accent transition-colors"
+                className="hover:text-boulder-accent transition-colors cursor-pointer"
               >
                 Login
               </Link>

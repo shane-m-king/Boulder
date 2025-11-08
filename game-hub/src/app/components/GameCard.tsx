@@ -34,7 +34,7 @@ export const GameCard = ({ game }: GameCardProps) => {
         {/* Overlay */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-boulder-gold/25 via-transparent to-transparent" />
 
-        {/* Subtle border glow on hover */}
+        {/* Border glow on hover */}
         <div className="absolute inset-0 border border-transparent group-hover:border-boulder-gold/40 rounded-xl transition-all duration-300 pointer-events-none" />
       </div>
 

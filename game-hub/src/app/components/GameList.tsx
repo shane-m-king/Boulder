@@ -16,7 +16,7 @@ interface GameListProps {
 }
 
 export const GameList = ({ games, loading, clearFilters }: GameListProps) => {
-  // 🟡 Skeleton shimmer while loading
+  // Skeleton shimmer while loading
   if (loading && !games.length) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-pulse">
@@ -54,7 +54,7 @@ export const GameList = ({ games, loading, clearFilters }: GameListProps) => {
     );
   }
 
-  // Actual cards
+  // Cards
   return (
     <AnimatePresence>
       <motion.div

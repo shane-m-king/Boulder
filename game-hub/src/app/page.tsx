@@ -23,7 +23,7 @@ export default function HomePage() {
           <br />
           Users can securely register, log in, browse games with filters and pagination,
           add titles to personal libraries with custom statuses, and post reviews with ratings.
-          Public profiles let you view other players’ collections and feedback.
+          Public profiles let you view other players's collections and feedback.
         </p>
 
         {/* Browse Button */}
@@ -48,9 +48,10 @@ export default function HomePage() {
             Plans for Future Updates:
           </h2>
           <div className="text-gray-400 italic">
-            <p>Add pricing information for price comparisons accross providers</p>
+            <p>Add pricing information for price comparisons across providers</p>
             <p>Add dedicated Reviews page</p>
             <p>Add friend functionality</p>
+            <p>Add smarter search result logic</p>
           </div>
         </div>
       </div>

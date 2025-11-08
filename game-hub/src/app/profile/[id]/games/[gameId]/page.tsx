@@ -121,7 +121,7 @@ export const UserGameDetailPage = ({
       { method: "GET" }
     );
 
-    // find the review that matches this specific game
+    // find the review that matches game
     const review = data.reviews.find((r) => r.game === gameId);
     if (review) {
       setExistingReview(true);

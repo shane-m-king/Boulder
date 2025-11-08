@@ -15,7 +15,6 @@ const RegisterPage = () => {
     password: "",
   });
 
-  // Registration logic with toasts
   const onRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -31,7 +30,6 @@ const RegisterPage = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Registration failed");
 
-        // Auto-login
         await login(formData.username, formData.password);
       })(),
       {

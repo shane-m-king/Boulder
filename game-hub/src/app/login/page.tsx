@@ -94,7 +94,7 @@ const LoginPage = () => {
         </form>
 
         <p className="text-center text-sm text-gray-400 mt-6">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <Link
             href="/register"
             className="text-boulder-gold hover:text-boulder-accent font-medium"

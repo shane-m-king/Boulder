@@ -95,9 +95,10 @@ export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingRevi
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Title</label>
+            <label htmlFor="review-title" className="block text-sm text-gray-300 mb-1">Title</label>
             <input
               type="text"
+              id="review-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full bg-boulder-mid/60 border border-boulder-gold/40 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-boulder-gold"
@@ -106,9 +107,10 @@ export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingRevi
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Rating (0-10)</label>
+            <label htmlFor="review-rating" className="block text-sm text-gray-300 mb-1">Rating (0-10)</label>
             <input
               type="number"
+              id="review-rating"
               min="0"
               max="10"
               value={rating}
@@ -118,8 +120,9 @@ export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingRevi
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Review</label>
+            <label htmlFor="review-body" className="block text-sm text-gray-300 mb-1">Review</label>
             <textarea
+              id="review-body"
               value={reviewBody}
               onChange={(e) => setReviewBody(e.target.value)}
               rows={4}

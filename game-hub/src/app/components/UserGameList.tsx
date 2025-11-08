@@ -37,7 +37,7 @@ export const UserGameList = ({
   reviewsMap,
   loading,
 }: UserGamesListProps) => {
-  // Shimmer loading skeleton (like GameList)
+  // Loading skeleton
   if (loading && !userGames.length) {
     return (
       <div className="flex flex-col gap-6 animate-pulse">
@@ -60,7 +60,7 @@ export const UserGameList = ({
     );
   }
 
-  // 🩶 Empty state
+  // Empty state
   if (!userGames.length) {
     return (
       <div className="text-center py-10 text-gray-400 italic">
@@ -69,7 +69,7 @@ export const UserGameList = ({
     );
   }
 
-  // 🧱 Animated list
+  // Animated list
   return (
     <AnimatePresence>
       <motion.div

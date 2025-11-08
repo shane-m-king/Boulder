@@ -45,7 +45,7 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
       setGame(game);
       setReviews(reviews);
 
-      // If logged in, check if game is in user library + pull status
+      // If logged in, check if game is in user library and get status
       if (user) {
         try {
           const data = await apiRequest<{ userGame?: { status: string } }>(

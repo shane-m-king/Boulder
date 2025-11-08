@@ -21,6 +21,7 @@ export const GameSearch = ({
   clearFilters,
   isSearching,
 }: GameSearchProps) => {
+  // Hard coded for now
   const genres = [
     "Action", "Adventure", "RPG", "Strategy", "Simulation", "Sports", "Horror", "Puzzle",
   ];

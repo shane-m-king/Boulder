@@ -101,15 +101,12 @@ export const UserGamePage = ({
         <h1 className="font-display text-3xl text-boulder-gold font-bold mb-8 text-center">
           {user?.id === userId ? "My Library" : "User Library"}
         </h1>
-
-        {/* === New abstracted UserGamesList === */}
         <UserGameList
           userId={userId}
           userGames={userGames}
           reviewsMap={reviewsMap}
           loading={loading}
         />
-
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-10 gap-3">

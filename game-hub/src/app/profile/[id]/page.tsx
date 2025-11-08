@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/helpers/apiRequest";
+import { toastAction } from "@/helpers/toastAction";
 import { useAuth } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import UserGameCard from "@/app/components/UserGameCard";
@@ -57,6 +58,8 @@ export const UserProfilePage = ({
   const [reviewsMap, setReviewsMap] = useState<Map<string, Review>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioDraft, setBioDraft] = useState("");
 
   // Resolve params
   useEffect(() => {
@@ -76,17 +79,18 @@ export const UserProfilePage = ({
 
       try {
         const [userData, gamesData, reviewsData] = await Promise.all([
-          apiRequest<{ user: UserProfile }>(`/api/users/${userId}`),
+          apiRequest< {user: UserProfile}>(`/api/users/${userId}`),
           apiRequest<UserGamesResponse>(
             `/api/users/${userId}/games?page=1&limit=2`
           ),
           apiRequest<ReviewsResponse>(`/api/users/${userId}/reviews`),
         ]);
 
-        setProfile(userData.user);
+        const fetchedUser = userData.user;
+        setProfile(fetchedUser);
+        setBioDraft(fetchedUser.bio || "");
         setRecentGames(gamesData.userGames);
 
-        // Build gameId → review map
         const map = new Map<string, Review>();
         for (const review of reviewsData.reviews) {
           if (review.game?._id) map.set(review.game._id, review);
@@ -106,14 +110,37 @@ export const UserProfilePage = ({
 
   const isCurrentUser = user?.id === profile?._id;
 
-  /* =============================
-        LOADING SKELETON
-     ============================= */
+  const handleSaveBio = async () => {
+  try {
+    const savePromise = apiRequest<{user: UserProfile}>(`/api/users/${userId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ bio: bioDraft }),
+    });
+
+    const result = await toastAction(savePromise, {
+      loading: "Saving bio...",
+      success: "Bio updated successfully!",
+      error: "Failed to update bio.",
+    });
+
+    const updatedUser = result?.user;
+    if (updatedUser) {
+      setProfile((prev) => (prev ? { ...prev, ...updatedUser } : updatedUser));
+      setBioDraft(updatedUser.bio || "");
+    }
+  } catch (err) {
+    console.error("Error saving bio:", err);
+  } finally {
+    setEditingBio(false); 
+  }  
+};
+
+
+  // Loading Skeleton
   if (loading)
     return (
       <ProtectedRoute>
         <div className="max-w-5xl mx-auto py-10 px-4 text-foreground animate-pulse">
-          {/* Profile Skeleton */}
           <div className="bg-boulder-mid/40 border border-boulder-gold/20 rounded-xl p-6 mb-8">
             <div className="h-6 bg-boulder-mid/60 rounded w-1/3 mb-3"></div>
             <div className="h-4 bg-boulder-mid/60 rounded w-1/4 mb-4"></div>
@@ -123,32 +150,10 @@ export const UserProfilePage = ({
               <div className="h-3 bg-boulder-mid/60 rounded w-2/3"></div>
             </div>
           </div>
-
-          {/* Game Cards Skeleton */}
-          <div className="space-y-6">
-            {Array.from({ length: 2 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex flex-col md:flex-row bg-boulder-mid/40 border border-boulder-gold/20 rounded-xl overflow-hidden"
-              >
-                <div className="md:w-1/4 w-full aspect-video bg-boulder-mid relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-boulder-gold/10 to-transparent animate-[shimmer_2s_infinite]" />
-                </div>
-                <div className="flex-1 p-5 space-y-3">
-                  <div className="h-4 w-2/3 bg-boulder-mid/60 rounded"></div>
-                  <div className="h-3 w-1/2 bg-boulder-mid/60 rounded"></div>
-                  <div className="h-3 w-full bg-boulder-mid/60 rounded"></div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </ProtectedRoute>
     );
 
-  /* =============================
-         ERROR & FALLBACKS
-     ============================= */
   if (error)
     return (
       <ProtectedRoute>
@@ -163,9 +168,6 @@ export const UserProfilePage = ({
       </ProtectedRoute>
     );
 
-  /* =============================
-           MAIN PROFILE VIEW
-     ============================= */
   return (
     <ProtectedRoute>
       <div className="max-w-5xl mx-auto py-10 px-4 text-foreground">
@@ -181,20 +183,69 @@ export const UserProfilePage = ({
               : "Unknown"}
           </p>
 
-          <p className="text-gray-300 leading-relaxed">
-            {profile.bio?.trim() ? (
-              <>{profile.bio}</>
-            ) : (
-              <span className="italic text-gray-500">
-                {isCurrentUser
-                  ? "You haven’t added a bio yet."
-                  : "This user hasn’t added a bio yet."}
-              </span>
-            )}
-          </p>
+          {/* Editable Bio Section */}
+          {isCurrentUser ? (
+            <div className="text-gray-300 leading-relaxed">
+              {editingBio ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={bioDraft}
+                    onChange={(e) => setBioDraft(e.target.value)}
+                    className="w-full bg-boulder-mid/60 border border-boulder-gold/40 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-boulder-gold resize-none"
+                    rows={3}
+                    placeholder="Write something about yourself..."
+                  />
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => setEditingBio(false)}
+                      className="px-3 py-1.5 text-sm rounded-md border border-boulder-gold/40 text-gray-400 hover:text-foreground hover:border-boulder-accent transition-all cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveBio}
+                      className="px-4 py-1.5 text-sm font-semibold bg-boulder-gold text-boulder-dark rounded-md hover:bg-boulder-accent hover:shadow-lg transition-all cursor-pointer"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              ) : profile.bio?.trim() ? (
+                <div className="flex justify-between items-start">
+                  <p className="whitespace-pre-line">{profile.bio}</p>
+                  <button
+                    onClick={() => setEditingBio(true)}
+                    className="text-xs text-boulder-accent underline ml-3 hover:text-boulder-gold transition cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                </div>
+              ) : (
+                <div className="flex justify-between items-start italic text-gray-500">
+                  <span>You haven’t added a bio yet.</span>
+                  <button
+                    onClick={() => setEditingBio(true)}
+                    className="text-xs text-boulder-accent underline ml-3 hover:text-boulder-gold transition"
+                  >
+                    Add Bio
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-gray-300 leading-relaxed">
+              {profile.bio?.trim() ? (
+                <>{profile.bio}</>
+              ) : (
+                <span className="italic text-gray-500">
+                  This user hasn't added a bio yet.
+                </span>
+              )}
+            </p>
+          )}
         </div>
 
-        {/* === Recent Games + Reviews === */}
+        {/* Recent Games + Reviews */}
         <div>
           <h2 className="font-display text-2xl text-boulder-accent mb-4">
             {isCurrentUser ? "Your Recent Games" : "Recent Games"}
@@ -220,7 +271,7 @@ export const UserProfilePage = ({
           )}
         </div>
 
-        {/* === Full Library Link === */}
+        {/* Full Library Link */}
         <div className="text-center sm:text-right mt-10">
           <Link
             href={`/profile/${userId}/games`}
@@ -232,6 +283,6 @@ export const UserProfilePage = ({
       </div>
     </ProtectedRoute>
   );
-}
+};
 
 export default UserProfilePage;
