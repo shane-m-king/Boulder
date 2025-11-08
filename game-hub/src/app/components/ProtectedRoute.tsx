@@ -16,8 +16,8 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     // Redirect to login if no user found
     if (!loading && !user) {
-      router.push("/login");
-      toast.error("Must be logged in");
+      setTimeout(() => router.push("/login"), 50);
+      // toast.error("Must be logged in"); Eventually can have this, but not triggering on regular logouts.
     }
   }, [user, loading, router]);
 

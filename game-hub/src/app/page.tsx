@@ -50,7 +50,7 @@ export default function HomePage() {
           <div className="text-gray-400 italic">
             <p>Add pricing information for price comparisons across providers</p>
             <p>Add dedicated Reviews page</p>
-            <p>Add friend functionality</p>
+            <p>Add friend capability</p>
             <p>Add smarter search result logic</p>
           </div>
         </div>
