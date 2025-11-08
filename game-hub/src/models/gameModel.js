@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 const { Schema, models, model } = mongoose;
 
+mongoose.set("strictQuery", true);
+
 const gameSchema = new Schema(
   {
     title: {

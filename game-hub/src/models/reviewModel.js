@@ -1,17 +1,21 @@
 import mongoose from "mongoose";
 const { Schema, models, model, Types } = mongoose;
 
+mongoose.set("strictQuery", true);
+
 const reviewSchema = new Schema(
   {
     user: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     game: {
       type: Types.ObjectId,
       ref: "Game",
       required: true,
+      index: true,
     },
     rating: {
       type: Number,
@@ -34,6 +38,8 @@ const reviewSchema = new Schema(
     timestamps: true,
   }
 );
+
+reviewSchema.index({ user: 1, game: 1 }, { unique: true });
 
 const Review = models.Review || model("Review", reviewSchema);
 

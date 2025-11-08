@@ -2,17 +2,21 @@ import mongoose from "mongoose";
 const { Schema, models, model, Types } = mongoose;
 import { STATUSES } from "@/constants/statuses";
 
+mongoose.set("strictQuery", true);
+
 const userGameSchema = new Schema(
   {
     user: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     game: {
       type: Types.ObjectId,
       ref: "Game",
       required: true,
+      index: true,
     },
     status: {
       type: String,
@@ -30,6 +34,8 @@ const userGameSchema = new Schema(
     timestamps: true,
   }
 );
+
+userGameSchema.index({ user: 1, game: 1 }, { unique: true });
 
 const UserGame = models.UserGame || model("UserGame", userGameSchema);
 

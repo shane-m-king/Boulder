@@ -20,7 +20,7 @@ const connect = async (): Promise<typeof mongoose> => {
       : process.env.MONGO_URI;
 
   if (!dbUri) {
-    throw new Error("❌ MONGO_URI not defined");
+    throw new Error("MONGO_URI not defined");
   }
 
   if (!cached.promise) {
@@ -34,10 +34,10 @@ const connect = async (): Promise<typeof mongoose> => {
     const connectWithRetry = async (retries = 3): Promise<typeof mongoose> => {
       try {
         const conn = await mongoose.connect(dbUri, opts);
-        console.log("✅ MongoDB connected");
+        console.log("MongoDB connected");
         return conn;
       } catch (err) {
-        console.error("⚠️ MongoDB connection failed, retrying...", err);
+        console.error("MongoDB connection failed, retrying...", err);
         if (retries <= 1) throw err;
         await new Promise((res) => setTimeout(res, 1000));
         return connectWithRetry(retries - 1);
