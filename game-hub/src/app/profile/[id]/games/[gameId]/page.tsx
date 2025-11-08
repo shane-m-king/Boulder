@@ -29,7 +29,7 @@ interface UserGame {
 interface Review {
   _id: string;
   title: string;
-  game: string;
+  game: { _id: string };
   reviewBody: string;
   rating: number;
   updatedAt: Date;
@@ -122,7 +122,7 @@ export const UserGameDetailPage = ({
     );
 
     // find the review that matches game
-    const review = data.reviews.find((r) => r.game === gameId);
+    const review = data.reviews.find((r) => r.game._id === gameId);
     if (review) {
       setExistingReview(true);
       setReviewTitle(review.title);
