@@ -48,7 +48,7 @@ export default function HomePage() {
             Plans for Future Updates:
           </h2>
           <div className="text-gray-400 italic">
-            <p>Add pricing information for price comparisons across providers</p>
+            <p>Add pricing info for price comparisons across providers</p>
             <p>Add dedicated Reviews page</p>
             <p>Add friend capability</p>
             <p>Add smarter search result logic</p>
