@@ -9,13 +9,13 @@ This version of Boulder is a submission to Springboard Software Engineering Boot
 
 ## Features
 
-- 🔐 **Secure Auth** – Register, login, logout, and access protected routes via JWT cookies
-- 🎮 **Game Browsing** – Paginated, searchable, and filterable by genre or platform
-- 🧾 **Game Details** – View full game info with genres, platforms, and user reviews
-- 📚 **Personal Library** – Add or remove games, set statuses (`Owned`, `Wishlisted`, `Not Owned`), and add notes
-- 👤 **User Profiles** – Public profile pages showing bio and library previews
-- ⭐ **Reviews** – Create, edit, and view reviews (0 – 10 rating)
-- ⚡ **UX Polish** – Framer Motion animations, Tailwind shimmer skeletons, and responsive dark theme
+- **Secure Auth** – Register, login, logout, and access protected routes via JWT cookies
+- **Game Browsing** – Paginated, searchable, and filterable by genre or platform
+- **Game Details** – View full game info with genres, platforms, and user reviews
+- **Personal Library** – Add or remove games, set statuses (`Owned`, `Wishlisted`, `Not Owned`), and add notes
+- **User Profiles** – Public profile pages showing bio and library previews
+- **Reviews** – Create, edit, and view reviews (0 – 10 rating)
+- **UX Polish** – Framer Motion animations, Tailwind shimmer skeletons, and responsive dark theme
 
 ---
 
