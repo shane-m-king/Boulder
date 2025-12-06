@@ -34,11 +34,19 @@ export const GamesPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 9;
 
+  // Reference to top of page
+  const topRef = useRef<HTMLDivElement | null>(null);
+
   // Debounce search to reduce fetch frequency
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(search), 500);
     return () => clearTimeout(handler);
   }, [search]);
+
+  // Scroll to top when page changes
+  useEffect(() => {
+  topRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [page]);
 
   // Fetch games whenever filters or page change
   useEffect(() => {
@@ -75,7 +83,7 @@ export const GamesPage = () => {
   };
 
   return (
-    <section className="min-h-[calc(100vh-4.1rem)] bg-boulder-dark text-foreground">
+    <section ref={topRef} className="min-h-[calc(100vh-4.1rem)] bg-boulder-dark text-foreground">
       <div className="container mx-auto py-8 px-4">
         <h1 className="font-display text-3xl md:text-4xl font-bold text-boulder-gold mb-6">
           Browse Games
