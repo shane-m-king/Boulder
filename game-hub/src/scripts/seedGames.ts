@@ -7,7 +7,7 @@ dotenv.config({ path: ".env.local" });
 
 const IGDB_CLIENT_ID = process.env.IGDB_CLIENT_ID!;
 const IGDB_ACCESS_TOKEN = process.env.IGDB_ACCESS_TOKEN!;
-const TOTAL_GAMES = 341440;
+const TOTAL_GAMES = 345154;
 const BATCH_SIZE = 50;
 const CONCURRENCY = 5;
 const PROGRESS_FILE = "./seedProgress.json";
@@ -34,7 +34,9 @@ async function fetchGames(limit = 50, offset = 0) {
       Authorization: `Bearer ${IGDB_ACCESS_TOKEN}`,
     },
     body: `
-      fields id, name, summary, genres.name, platforms.name, first_release_date, cover.url;
+      fields id, name, summary, genres.name, platforms.name,
+      first_release_date, cover.url, rating, total_rating,
+      total_rating_count, hypes;
       where first_release_date != null;
       sort first_release_date desc;
       limit ${limit};
@@ -57,17 +59,27 @@ function formatGame(game: any) {
       ? game.cover.url.replace("t_thumb", "t_cover_big")
       : "",
     releaseDate: new Date(game.first_release_date * 1000),
+    IGDBid: game.id ?? null,
+    IGDBrating: game.rating ?? null,
+    IGDBtotalRating: game.total_rating ?? null,
+    IGDBratingCount: game.total_rating_count ?? null,
+    IGDBhypes: game.hypes ?? null,
   };
 }
 
 // Upsert a batch to MongoDB
-async function upsertBatch(batch: any[]) {
-  for (const game of batch) {
-    const formatted = formatGame(game);
-    await Game.findOneAndUpdate(
-      { title: formatted.title },
-      { $set: formatted },
-      { upsert: true, new: true }
+async function upsertBatch(batch: any[], chunkSize = 10) {
+  for (let i = 0; i < batch.length; i += chunkSize) {
+    const chunk = batch.slice(i, i + chunkSize);
+    await Promise.all(
+      chunk.map((game) => {
+        const formatted = formatGame(game);
+        return Game.findOneAndUpdate(
+          { IGDBid: game.id },                // unique IGDB ID
+          { $set: { ...formatted, IGDBid: game.id } },
+          { upsert: true, new: true }
+        );
+      })
     );
   }
 }
@@ -88,7 +100,7 @@ async function seedGames() {
         const offset = (i + j) * BATCH_SIZE;
         promises.push(
           fetchGames(BATCH_SIZE, offset)
-            .then(upsertBatch)
+            .then((games) => upsertBatch(games))   // use optimized batch upsert
             .then(() => console.log(`Batch ${i + j + 1}/${numBatches} processed`))
         );
       }

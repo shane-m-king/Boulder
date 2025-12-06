@@ -51,7 +51,6 @@ export default function HomePage() {
             <p>Add pricing info for price comparisons across providers</p>
             <p>Add dedicated Reviews page</p>
             <p>Add friend capability</p>
-            <p>Add smarter search result logic</p>
           </div>
         </div>
       </div>

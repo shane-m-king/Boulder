@@ -21,19 +21,43 @@ export const GameSearch = ({
   clearFilters,
   isSearching,
 }: GameSearchProps) => {
-  // Hard coded for now
+  
+  // All genres listed from IGDB
   const genres = [
-    "Action", "Adventure", "RPG", "Strategy", "Simulation", "Sports", "Horror", "Puzzle",
-  ];
-  const platforms = [
-    "PC", "PlayStation", "Xbox", "Switch", "Mobile", "Mac", "Linux",
+    "Adventure",
+    "Arcade",
+    "Card & Board Game",
+    "Fighting",
+    "Hack and slash/Beat 'em up",
+    "Indie",
+    "MOBA",
+    "Music",
+    "Pinball",
+    "Platform",
+    "Point-and-click",
+    "Puzzle",
+    "Quiz/Trivia",
+    "Racing",
+    "Real Time Strategy",
+    "Role-playing",
+    "Shooter",
+    "Simulator",
+    "Sport",
+    "Strategy",
+    "Tactical",
+    "Turn-based strategy",
+    "Visual Novel"
   ];
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+      
       {/* Search */}
       <div className="flex-1 relative">
-        <label htmlFor="search" className="block text-sm font-semibold text-gray-300 mb-1 uppercase tracking-wider">
+        <label
+          htmlFor="search"
+          className="block text-sm font-semibold text-gray-300 mb-1 uppercase tracking-wider"
+        >
           Search
         </label>
         <input
@@ -44,12 +68,17 @@ export const GameSearch = ({
           onChange={(e) => setSearch(e.target.value)}
           className="w-full px-4 py-2 bg-boulder-mid/70 border border-boulder-gold/30 rounded-lg text-foreground focus:ring-2 focus:ring-boulder-gold pr-10"
         />
-        {isSearching && <Loader2 className="absolute right-3 bottom-2.5 h-4 w-4 text-boulder-gold animate-spin" />}
+        {isSearching && (
+          <Loader2 className="absolute right-3 bottom-2.5 h-4 w-4 text-boulder-gold animate-spin" />
+        )}
       </div>
 
       {/* Genre */}
       <div className="sm:w-48">
-        <label htmlFor="genre" className="block text-sm font-semibold text-gray-300 mb-1 uppercase tracking-wider">
+        <label
+          htmlFor="genre"
+          className="block text-sm font-semibold text-gray-300 mb-1 uppercase tracking-wider"
+        >
           Genre
         </label>
         <select
@@ -59,24 +88,31 @@ export const GameSearch = ({
           className="w-full px-3 py-2 bg-boulder-mid/70 border border-boulder-gold/30 rounded-lg text-foreground focus:ring-2 focus:ring-boulder-gold"
         >
           <option value="">All</option>
-          {genres.map((g) => <option key={g} value={g}>{g}</option>)}
+          {genres.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
         </select>
       </div>
 
-      {/* Platform */}
-      <div className="sm:w-48">
-        <label htmlFor="platform" className="block text-sm font-semibold text-gray-300 mb-1 uppercase tracking-wider">
+      {/* Platform - */}
+      <div className="sm:w-48 relative">
+        <label
+          htmlFor="platform"
+          className="block text-sm font-semibold text-gray-300 mb-1 uppercase tracking-wider"
+        >
           Platform
         </label>
-        <select
+
+        <input
           id="platform"
+          type="text"
+          placeholder="Search platforms..."
           value={platform}
           onChange={(e) => setPlatform(e.target.value)}
-          className="w-full px-3 py-2 bg-boulder-mid/70 border border-boulder-gold/30 rounded-lg text-foreground focus:ring-2 focus:ring-boulder-gold"
-        >
-          <option value="">All</option>
-          {platforms.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
+          className="w-full px-4 py-2 bg-boulder-mid/70 border border-boulder-gold/30 rounded-lg text-foreground focus:ring-2 focus:ring-boulder-gold"
+        />
       </div>
 
       {(genre || platform || search) && (
@@ -91,5 +127,6 @@ export const GameSearch = ({
       )}
     </div>
   );
-}
- export default GameSearch;
+};
+
+export default GameSearch;

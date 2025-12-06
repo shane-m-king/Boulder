@@ -30,6 +30,27 @@ const gameSchema = new Schema(
       type: Date,
       required: [true, "Please provide release date"],
     },
+    IGDBid: {
+      type: Number,
+      unique: true,
+      default: null,
+    },
+    IGDBrating: {
+      type: Number,
+      default: null,
+    },
+    IGDBtotalRating: {
+      type: Number,
+      default: null,
+    },
+    IGDBratingCount: {
+      type: Number,
+      default: null,
+    },
+    IGDBhypes: {
+      type: Number,
+      default: null,
+    },
   },
   {
     timestamps: true,
