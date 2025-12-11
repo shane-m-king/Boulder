@@ -8,6 +8,8 @@ export const GamePages = ({ page, totalPages, setPage }: GamePagesProps) => {
   const getPaginationRange = () => {
     const maxVisible = 9;
     const range: (number | string)[] = [];
+    const maxJump = 100;
+    const maxShown = page + maxJump > totalPages ? totalPages : page + maxJump;
     const totalNumbersToShow = maxVisible - 2;
     const leftBound = page - Math.floor(totalNumbersToShow / 2);
     const rightBound = page + Math.floor(totalNumbersToShow / 2);
@@ -19,7 +21,7 @@ export const GamePages = ({ page, totalPages, setPage }: GamePagesProps) => {
 
     if (page <= Math.ceil(totalNumbersToShow / 2)) {
       for (let i = 1; i <= totalNumbersToShow + 1; i++) range.push(i);
-      range.push("…", totalPages);
+      range.push("…", maxShown);
       return range;
     }
 
@@ -28,10 +30,10 @@ export const GamePages = ({ page, totalPages, setPage }: GamePagesProps) => {
       for (let i = totalPages - totalNumbersToShow; i <= totalPages; i++) range.push(i);
       return range;
     }
-
+    
     range.push(1, "…");
     for (let i = leftBound; i <= rightBound; i++) range.push(i);
-    range.push("…", totalPages);
+    range.push("…", maxShown);
     return range;
   };
 

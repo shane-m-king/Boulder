@@ -20,6 +20,7 @@ describe("/api/games/[id] Route", () => {
       genres: ["Platformer"],
       platforms: ["PC", "Nintendo Switch"],
       thumbnailUrl: "",
+      IGDBid: 1,
       releaseDate: new Date("2018-01-25"),
     });
     gameId = game._id.toString();

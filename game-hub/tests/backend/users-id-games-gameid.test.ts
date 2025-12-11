@@ -56,6 +56,7 @@ describe("/api/users/[id]/games/[gameId] Route", () => {
       genres: ["Action"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 1,
       releaseDate: new Date("2017-02-24"),
     });
 
@@ -113,6 +114,7 @@ describe("/api/users/[id]/games/[gameId] Route", () => {
       genres: ["Platformer"],
       platforms: ["Switch"],
       thumbnailUrl: "",
+      IGDBid: 2,
       releaseDate: new Date("2018-01-25"),
     });
 
@@ -274,6 +276,7 @@ describe("/api/users/[id]/games/[gameId] Route", () => {
       genres: ["Action"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 3,
       releaseDate: new Date("2020-09-17"),
     });
 

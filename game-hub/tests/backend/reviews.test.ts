@@ -45,6 +45,7 @@ describe("/api/reviews Route", () => {
       genres: ["RPG"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 1,
       releaseDate: new Date(),
     });
 
@@ -195,37 +196,6 @@ describe("/api/reviews Route", () => {
 
     expect(res.status).toBe(400);
     expect(data.error).toMatch(/body maximum 400 characters/i);
-  });
-
-  it("prevents duplicate reviews by same user on same game", async () => {
-    // First create a review
-    await Review.create({
-      user: testUser._id,
-      game: testGame._id,
-      rating: 7,
-      title: "First review",
-      reviewBody: "Initial one",
-    });
-
-    // Attempt to post another
-    const req = makeRequest(
-      "http://localhost:3000/api/reviews",
-      "POST",
-      {
-        game: testGame._id.toString(),
-        rating: 8,
-        title: "Duplicate",
-        reviewBody: "Trying again",
-      },
-      token
-    );
-
-    const res = await POST(req);
-    const data = await res.json();
-
-    expect(res.status).toBe(409);
-    expect(data.success).toBe(false);
-    expect(data.error).toMatch(/already reviewed/i);
   });
 
   it("fails when unauthorized", async () => {

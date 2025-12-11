@@ -23,6 +23,7 @@ describe("/api/reviews/[id] Route", () => {
   let testUser: any;
   let otherUser: any;
   let testGame: any;
+  let otherGame: any;
   let testReview: any;
   let token: string;
 
@@ -54,6 +55,17 @@ describe("/api/reviews/[id] Route", () => {
       genres: ["RPG"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 1,
+      releaseDate: new Date(),
+    });
+
+    otherGame = await Game.create({
+      title: "otherGame",
+      summary: "Another game",
+      genres: ["Action"],
+      platforms: ["Switch"],
+      thumbnailUrl: "",
+      IGDBid: 2,
       releaseDate: new Date(),
     });
 
@@ -163,7 +175,7 @@ describe("/api/reviews/[id] Route", () => {
   it("deletes a review successfully", async () => {
     const reviewToDelete = await Review.create({
       user: testUser._id,
-      game: testGame._id,
+      game: otherGame._id,
       rating: 6,
       title: "Delete me",
       reviewBody: "Temporary review",

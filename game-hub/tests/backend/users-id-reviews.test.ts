@@ -51,6 +51,7 @@ describe("/api/users/[id]/reviews Route", () => {
       genres: ["RPG"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 1,
       releaseDate: new Date(),
     });
 
@@ -60,6 +61,7 @@ describe("/api/users/[id]/reviews Route", () => {
       genres: ["Action"],
       platforms: ["Switch"],
       thumbnailUrl: "",
+      IGDBid: 2,
       releaseDate: new Date(),
     });
 
@@ -69,6 +71,7 @@ describe("/api/users/[id]/reviews Route", () => {
       genres: ["Strategy"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 3,
       releaseDate: new Date(),
     });
 

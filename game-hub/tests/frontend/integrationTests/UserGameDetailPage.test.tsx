@@ -51,6 +51,7 @@ describe("/profile/[id]/games/[gameId] page integration", () => {
   const mockUserGameResponse = {
     userGame: {
       _id: "ug1",
+      user: "user123",
       status: "Owned",
       notes: "Really enjoyed this one.",
       updatedAt: new Date().toISOString(),
@@ -60,6 +61,7 @@ describe("/profile/[id]/games/[gameId] page integration", () => {
         thumbnailUrl: "",
         genres: ["Action", "RPG"],
         platforms: ["PC"],
+        IGDBid: 1,
         releaseDate: new Date().toISOString(),
       },
     },
@@ -72,7 +74,7 @@ describe("/profile/[id]/games/[gameId] page integration", () => {
         title: "Amazing Experience",
         reviewBody: "A truly incredible journey.",
         rating: 10,
-        game: "game456",
+        game: { _id: "game456" },
         updatedAt: new Date().toISOString(),
       },
     ],
@@ -91,7 +93,7 @@ describe("/profile/[id]/games/[gameId] page integration", () => {
       .mockResolvedValueOnce(mockUserGameResponse);
 
     render(<UserGameDetailPage params={mockParams} />);
-
+    
     // Wait for the title to appear
     await screen.findByText("Elden Ring");
 
@@ -103,7 +105,7 @@ describe("/profile/[id]/games/[gameId] page integration", () => {
     // Review section
     expect(screen.getByText("Amazing Experience")).toBeInTheDocument();
     expect(screen.getByText(/a truly incredible journey/i)).toBeInTheDocument();
-    expect(screen.getByText(/10/i)).toBeInTheDocument();
+    expect(screen.getByText("⭐ 10/10")).toBeInTheDocument();
 
     // Buttons visible for owner
     expect(screen.getByText(/save changes/i)).toBeInTheDocument();

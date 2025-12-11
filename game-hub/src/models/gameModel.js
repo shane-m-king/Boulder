@@ -33,6 +33,7 @@ const gameSchema = new Schema(
     IGDBid: {
       type: Number,
       unique: true,
+      index: true,
       default: null,
     },
     IGDBrating: {
@@ -56,6 +57,11 @@ const gameSchema = new Schema(
     timestamps: true,
   }
 );
+
+gameSchema.index({ title: 1 });
+gameSchema.index({ IGDBratingCount: -1, title: 1, _id: 1 });
+gameSchema.index({ genres: 1 });
+gameSchema.index({ platforms: 1 });
 
 const Game = models.Game || model("Game", gameSchema);
 

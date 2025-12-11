@@ -12,9 +12,14 @@ jest.mock("react-hot-toast", () => ({
 
 describe("/games page integration", () => {
   const mockGames = [
-    { _id: "1", title: "Elden Ring", genres: ["RPG"], platforms: ["PC"], thumbnailUrl: "" },
-    { _id: "2", title: "Celeste", genres: ["Platformer"], platforms: ["Switch"], thumbnailUrl: "" },
+    { _id: "1", title: "Elden Ring", genres: ["RPG"], platforms: ["PC"], thumbnailUrl: "", IGDBid: 1 },
+    { _id: "2", title: "Celeste", genres: ["Platformer"], platforms: ["Switch"], thumbnailUrl: "", IGDBid: 2 },
   ];
+
+  // Mock scrollIntoView just for this suite
+  beforeAll(() => {
+    Element.prototype.scrollIntoView = jest.fn();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -84,6 +89,32 @@ describe("/games page integration", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/no games found/i)).toBeInTheDocument();
+    });
+  });
+
+  it("scrolls to top when page changes", async () => {
+    (apiRequest as jest.Mock).mockResolvedValue({
+      games: mockGames,
+      page: 1,
+      totalPages: 2,
+      total: 2,
+      limit: 1,
+    });
+
+    render(<GamesPage />);
+
+    // Simulate initial fetch
+    await waitFor(() => {
+      expect(screen.getByText("Elden Ring")).toBeInTheDocument();
+    });
+
+    // Simulate page change
+    const nextPageButton = screen.getByText(/Next/i);
+    fireEvent.click(nextPageButton);
+
+    // Wait for the new page fetch
+    await waitFor(() => {
+      expect(Element.prototype.scrollIntoView).toHaveBeenCalled();
     });
   });
 });

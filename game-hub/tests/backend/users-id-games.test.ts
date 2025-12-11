@@ -59,6 +59,7 @@ describe("/api/users/[id]/games Route", () => {
         genres: ["RPG"],
         platforms: ["PC"],
         thumbnailUrl: "",
+        IGDBid: 1,
         releaseDate: new Date("2022-02-25"),
       },
       {
@@ -67,6 +68,7 @@ describe("/api/users/[id]/games Route", () => {
         genres: ["Platformer"],
         platforms: ["Switch"],
         thumbnailUrl: "",
+        IGDBid: 2,
         releaseDate: new Date("2018-01-25"),
       },
       {
@@ -75,6 +77,7 @@ describe("/api/users/[id]/games Route", () => {
         genres: ["Action"],
         platforms: ["PC"],
         thumbnailUrl: "",
+        IGDBid: 3,
         releaseDate: new Date("2020-09-17"),
       },
     ]);
@@ -203,6 +206,7 @@ describe("/api/users/[id]/games Route", () => {
       genres: ["Action"],
       platforms: ["PC"],
       thumbnailUrl: "",
+      IGDBid: 4,
       releaseDate: new Date("2017-02-24")
     });
 
@@ -269,6 +273,7 @@ describe("/api/users/[id]/games Route", () => {
       genres: ["Adventure"],
       platforms: ["Switch"],
       thumbnailUrl: "",
+      IGDBid: 5,
       releaseDate: new Date("2017-03-03")
     });
     const req = makeRequest(

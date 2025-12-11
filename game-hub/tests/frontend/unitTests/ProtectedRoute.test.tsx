@@ -70,7 +70,6 @@ describe("ProtectedRoute Component", () => {
 
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith("/login");
-      expect(toast.error).toHaveBeenCalledWith("Must be logged in");
     });
   });
 

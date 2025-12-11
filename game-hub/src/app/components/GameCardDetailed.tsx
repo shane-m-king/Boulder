@@ -212,7 +212,7 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
                 <div className="flex flex-wrap items-center gap-4">
                   <button
                     onClick={handleRemove}
-                    className="bg-red-500/80 hover:bg-red-500 text-white font-semibold px-4 py-2 rounded-md transition-all"
+                    className="bg-red-500/80 hover:bg-red-500 text-white font-semibold px-4 py-2 rounded-md transition-all cursor-pointer"
                   >
                     Remove from Library
                   </button>
@@ -223,7 +223,7 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
                       id="status"
                       value={status}
                       onChange={(e) => handleStatusChange(e.target.value)}
-                      className="bg-boulder-mid/60 border border-boulder-gold/40 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-boulder-gold"
+                      className="bg-boulder-mid/60 border border-boulder-gold/40 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-boulder-gold cursor-pointer"
                     >
                       {STATUSES.map((s) => (
                         <option key={s} value={s}>

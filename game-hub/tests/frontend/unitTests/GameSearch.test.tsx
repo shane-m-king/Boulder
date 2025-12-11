@@ -72,10 +72,10 @@ describe("GameSearch Component", () => {
     const genreSelect = screen.getByLabelText(/Genre/i);
     const platformSelect = screen.getByLabelText(/Platform/i);
 
-    fireEvent.change(genreSelect, { target: { value: "Action" } });
+    fireEvent.change(genreSelect, { target: { value: "Arcade" } });
     fireEvent.change(platformSelect, { target: { value: "PC" } });
 
-    expect(mockSetGenre).toHaveBeenCalledWith("Action");
+    expect(mockSetGenre).toHaveBeenCalledWith("Arcade");
     expect(mockSetPlatform).toHaveBeenCalledWith("PC");
   });
 

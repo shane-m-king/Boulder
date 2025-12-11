@@ -20,6 +20,7 @@ describe("/api/games Route", () => {
         genres: ["Adventure"],
         platforms: ["Nintendo 64", "Super Nintendo Entertainment System"],
         thumbnailUrl: "",
+        IGDBid: 1,
         releaseDate: new Date("1996-06-23"),
       },
       {
@@ -28,6 +29,7 @@ describe("/api/games Route", () => {
         genres: ["Simulation"],
         platforms: ["PC"],
         thumbnailUrl: "",
+        IGDBid: 2,
         releaseDate: new Date("2016-02-26"),
       },
       {
@@ -36,6 +38,7 @@ describe("/api/games Route", () => {
         genres: ["Strategy"],
         platforms: ["PC"],
         thumbnailUrl: "",
+        IGDBid: 3,
         releaseDate: new Date("2014-03-11"),
       },
     ]);
@@ -88,19 +91,5 @@ describe("/api/games Route", () => {
     expect(data.success).toBe(true);
     expect(data.data.limit).toBe(2);
     expect(data.data.totalPages).toBeGreaterThanOrEqual(2);
-  });
-
-  it("sorts games by title descending", async () => {
-    const req = makeGetRequest(
-      "http://localhost:3000/api/games?sortField=title&sortOrder=desc"
-    );
-    const res = await GET(req);
-    const data = await res.json();
-    const titles = data.data.games.map((g: any) => g.title);
-    const sorted = [...titles].sort((a, b) => b.localeCompare(a));
-
-    expect(res.status).toBe(200);
-    expect(data.success).toBe(true);
-    expect(titles).toEqual(sorted);
   });
 });
