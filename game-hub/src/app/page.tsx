@@ -49,6 +49,7 @@ export default function HomePage() {
           </h2>
           <div className="text-gray-400 italic">
             <p>Add pricing info for price comparisons across providers</p>
+            <p>Add support for browsing other profiles</p>
             <p>Add dedicated Reviews page</p>
             <p>Add friend capability</p>
           </div>
