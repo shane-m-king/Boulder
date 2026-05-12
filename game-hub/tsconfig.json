@@ -23,7 +23,6 @@
       }
     ],
     "types": ["jest", "node"],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
