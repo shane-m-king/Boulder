@@ -2,11 +2,15 @@ import connect from "@/dbConfig/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import { invalidId } from "@/helpers/invalidId";
 import { verifyUser } from "@/helpers/verifyUser";
+import { getPagination } from "@/helpers/pagination";
 import Review from "@/models/reviewModel";
 
 interface Params {
   id: string;
 }
+
+// Fields a user's reviews can be sorted by (prevents arbitrary field injection)
+const ALLOWED_SORT_FIELDS = ["createdAt", "updatedAt", "rating", "title"];
 
   export const GET = async (request: NextRequest, context: { params: Promise<Params> }) => {
     try {
@@ -25,12 +29,13 @@ interface Params {
       const { searchParams } = new URL(request.url);
   
       // Set up pagination
-      const page = parseInt(searchParams.get("page") || "1");
-      const limit = parseInt(searchParams.get("limit") || "10");
-      const skip = (page - 1) * limit;
-  
-      // Sort results
-      const sortField = searchParams.get("sortField") || "createdAt";
+      const { page, limit, skip } = getPagination(searchParams);
+
+      // Sort results (fall back to default if requested field isn't allowed)
+      const requestedSortField = searchParams.get("sortField") || "createdAt";
+      const sortField = ALLOWED_SORT_FIELDS.includes(requestedSortField)
+        ? requestedSortField
+        : "createdAt";
       const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
       const sort: Record<string, 1 | -1> = { [sortField]: sortOrder };
   

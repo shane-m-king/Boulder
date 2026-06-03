@@ -3,10 +3,15 @@ import UserGame from "@/models/userGameModel";
 import { NextRequest, NextResponse } from "next/server";
 import { invalidId } from "@/helpers/invalidId";
 import { verifyUser } from "@/helpers/verifyUser";
+import { escapeRegex } from "@/helpers/escapeRegex";
+import { getPagination } from "@/helpers/pagination";
 
 interface Params {
   id: string;
 }
+
+// Fields a user library can be sorted by (prevents arbitrary field injection)
+const ALLOWED_SORT_FIELDS = ["updatedAt", "createdAt", "status"];
 
 export const GET = async (request: NextRequest, context: { params: Promise<Params> }) => {
   try {
@@ -25,16 +30,17 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
     const { searchParams } = new URL(request.url);
 
     // Set up pagination
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = getPagination(searchParams);
 
     // Filter
     const search = searchParams.get("search")?.trim();
     const statusFilter = searchParams.get("status");
 
-    // Sort results
-    const sortField = searchParams.get("sortField") || "updatedAt";
+    // Sort results (fall back to default if requested field isn't allowed)
+    const requestedSortField = searchParams.get("sortField") || "updatedAt";
+    const sortField = ALLOWED_SORT_FIELDS.includes(requestedSortField)
+      ? requestedSortField
+      : "updatedAt";
     const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
     const sort: Record<string, 1 | -1> = { [sortField]: sortOrder };
 
@@ -51,11 +57,11 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
     }
 
     if (search) {
-      const regex = new RegExp(search, "i");
+      const regex = new RegExp(escapeRegex(search), "i");
       filteredGames = filteredGames.filter(usergame =>
         regex.test(usergame.game.title) ||
-        regex.test(usergame.game.genre) ||
-        regex.test(usergame.game.platform)
+        usergame.game.genres?.some((g: string) => regex.test(g)) ||
+        usergame.game.platforms?.some((p: string) => regex.test(p))
       );
     }
 

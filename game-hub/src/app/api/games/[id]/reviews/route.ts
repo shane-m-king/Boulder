@@ -2,10 +2,21 @@ import connect from "@/dbConfig/dbConfig";
 import Review from "@/models/reviewModel";
 import { NextRequest, NextResponse } from "next/server";
 import { invalidId } from "@/helpers/invalidId";
+import { getPagination } from "@/helpers/pagination";
 
 interface Params {
   id: string; // gameId
 }
+
+// Sort orders a game's reviews can use (prevents arbitrary field injection)
+const ALLOWED_SORTS = [
+  "-updatedAt",
+  "updatedAt",
+  "-createdAt",
+  "createdAt",
+  "-rating",
+  "rating",
+];
 
 export const GET = async (
   request: NextRequest,
@@ -22,13 +33,12 @@ export const GET = async (
     if (idCheckFailed) return idCheckFailed;
 
     // Pagination
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "10", 10);
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = getPagination(searchParams);
 
     // Filters
     const userId = searchParams.get("user"); // filter by specific user
-    const sort = searchParams.get("sort") || "-updatedAt"; // newest first
+    const requestedSort = searchParams.get("sort") || "-updatedAt";
+    const sort = ALLOWED_SORTS.includes(requestedSort) ? requestedSort : "-updatedAt"; // newest first
 
     // Build query dynamically
     const query: Record<string, any> = { game: params.id };

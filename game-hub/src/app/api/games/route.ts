@@ -1,6 +1,8 @@
 import connect from "@/dbConfig/dbConfig";
 import Game from "@/models/gameModel";
 import { NextRequest, NextResponse } from "next/server";
+import { escapeRegex } from "@/helpers/escapeRegex";
+import { getPagination } from "@/helpers/pagination";
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -8,9 +10,7 @@ export const GET = async (request: NextRequest) => {
 
     const { searchParams } = new URL(request.url);
 
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = getPagination(searchParams);
 
     const search = searchParams.get("search")?.trim();
     const genre = searchParams.get("genre")?.trim();
@@ -19,15 +19,15 @@ export const GET = async (request: NextRequest) => {
     const match: Record<string, any> = {};
 
     if (genre) {
-      match.genres = { $regex: genre, $options: "i" };
+      match.genres = { $regex: escapeRegex(genre), $options: "i" };
     }
 
     if (platform) {
-      match.platforms = { $regex: platform, $options: "i" };
+      match.platforms = { $regex: escapeRegex(platform), $options: "i" };
     }
 
     // Build search regex only once
-    const searchRegex = search ? new RegExp(search, "i") : null;
+    const searchRegex = search ? new RegExp(escapeRegex(search), "i") : null;
 
     // ---- AGGREGATION PIPELINE ----
     const pipeline: any[] = [];
@@ -54,7 +54,7 @@ export const GET = async (request: NextRequest) => {
                   case: {
                     $regexMatch: {
                       input: "$title",
-                      regex: new RegExp(`^${search}`, "i"),
+                      regex: new RegExp(`^${escapeRegex(search)}`, "i"),
                     },
                   },
                   then: 1,
@@ -86,8 +86,9 @@ export const GET = async (request: NextRequest) => {
     // Execute pipeline
     const games = await Game.aggregate(pipeline);
 
-    // Get total count (filters only)
-    const totalGames = await Game.countDocuments(match);
+    // Get total count (include search filter so pagination matches results)
+    const countMatch = search ? { ...match, title: searchRegex } : match;
+    const totalGames = await Game.countDocuments(countMatch);
     const totalPages = Math.ceil(totalGames / limit);
 
     return NextResponse.json(

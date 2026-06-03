@@ -3,6 +3,7 @@ import { POST as loginPOST } from "@/app/api/auth/login/route";
 import { POST as registerPOST } from "@/app/api/auth/register/route";
 import connect from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
+import RateLimit from "@/models/rateLimitModel";
 import mongoose from "mongoose";
 
 const makePostRequest = (url: string, body: any) =>
@@ -31,6 +32,11 @@ describe("/api/auth/login Route", () => {
 
     expect(registerRes.status).toBe(201);
     expect(registerData.success).toBe(true);
+  });
+
+  // Reset rate-limit counters so each test gets a fresh window
+  beforeEach(async () => {
+    await RateLimit.deleteMany({});
   });
 
   afterAll(async () => {
@@ -89,9 +95,10 @@ describe("/api/auth/login Route", () => {
     const res = await loginPOST(req);
     const data = await res.json();
 
-    expect(res.status).toBe(404);
+    // Generic error so attackers can't tell which usernames exist
+    expect(res.status).toBe(401);
     expect(data.success).toBe(false);
-    expect(data.error).toBe("Username not found");
+    expect(data.error).toBe("Invalid username or password");
   });
 
   it("rejects invalid password", async () => {
@@ -105,6 +112,6 @@ describe("/api/auth/login Route", () => {
 
     expect(res.status).toBe(401);
     expect(data.success).toBe(false);
-    expect(data.error).toBe("Invalid password");
+    expect(data.error).toBe("Invalid username or password");
   });
 });

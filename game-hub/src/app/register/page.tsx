@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { toastAction } from "@/helpers/toastAction";
+import { formatRetryAfter } from "@/helpers/retryAfter";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -28,7 +29,15 @@ const RegisterPage = () => {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Registration failed");
+        if (!res.ok) {
+          if (res.status === 429) {
+            const retryAfter = Number(res.headers.get("Retry-After"));
+            throw new Error(
+              `Too many attempts. Please try again in ${formatRetryAfter(retryAfter)}.`
+            );
+          }
+          throw new Error(data.error || "Registration failed");
+        }
 
         await login(formData.username, formData.password);
       })(),

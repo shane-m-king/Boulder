@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { POST } from "@/app/api/auth/register/route";
 import connect from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
+import RateLimit from "@/models/rateLimitModel";
 import mongoose from "mongoose";
 
 const makePostRequest = (body: any) =>
@@ -16,6 +17,11 @@ describe("/api/auth/register Route", () => {
     jest.resetModules();
     await connect();
     await User.deleteMany({});
+  });
+
+  // Reset rate-limit counters so each test gets a fresh window
+  beforeEach(async () => {
+    await RateLimit.deleteMany({});
   });
 
   afterAll(async () => {

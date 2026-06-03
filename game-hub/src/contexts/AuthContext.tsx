@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatRetryAfter } from "@/helpers/retryAfter";
 
 interface User {
   id: string;
@@ -63,6 +64,12 @@ const login = async (username: string, password: string) => {
     const data = await res.json();
 
     if (!res.ok) {
+      if (res.status === 429) {
+        const retryAfter = Number(res.headers.get("Retry-After"));
+        throw new Error(
+          `Too many attempts. Please try again in ${formatRetryAfter(retryAfter)}.`
+        );
+      }
       throw new Error(data.error || "Login failed");
     }
 

@@ -86,11 +86,20 @@ export const PATCH = async (request: NextRequest, context: { params: Promise<Par
   
     // Validate and set username
     if (body.username !== undefined) {
-      const username = body.username.trim();
+      const username = body.username.trim().toLowerCase();
       if (username.length < 3 || username.length > 20) {
         console.error("Invalid username length");
         return NextResponse.json(
           { success: false, error: "Username must be 3-20 characters" },
+          { status: 400 }
+        );
+      }
+      // Reject duplicate usernames with a clean 400 (schema unique index would otherwise throw a 500)
+      const existingUser = await User.findOne({ username, _id: { $ne: params.id } });
+      if (existingUser) {
+        console.error("Username already exists");
+        return NextResponse.json(
+          { success: false, error: "Username already exists" },
           { status: 400 }
         );
       }

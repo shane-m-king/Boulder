@@ -132,7 +132,8 @@ describe("/api/users/[id] Route", () => {
 
     expect(res.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(data.data.user.username).toBe("updatedUser");
+    // Mixed-case input is normalized to lowercase, consistent with register/login
+    expect(data.data.user.username).toBe("updateduser");
     expect(data.data.user.bio).toBe("Updated bio");
     expect(data.data.user.isCurrentUser).toBe(true);
   });

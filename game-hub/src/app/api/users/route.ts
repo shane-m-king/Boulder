@@ -2,6 +2,11 @@ import connect from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyUser } from "@/helpers/verifyUser";
+import { escapeRegex } from "@/helpers/escapeRegex";
+import { getPagination } from "@/helpers/pagination";
+
+// Fields users are allowed to sort by (prevents arbitrary field injection)
+const ALLOWED_SORT_FIELDS = ["createdAt", "username"];
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -14,18 +19,19 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
 
     // Set up pagination
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
-    
+    const { page, limit, skip } = getPagination(searchParams);
+
     // Set up searching for specific usernames
     const search = (searchParams.get("search") || "").trim();
     const filter = search
-      ? { username: { $regex: search, $options: "i" } }
+      ? { username: { $regex: escapeRegex(search), $options: "i" } }
       : {};
 
-    // Sort results
-    const sortField = searchParams.get("sortField") || "createdAt";
+    // Sort results (fall back to default if requested field isn't allowed)
+    const requestedSortField = searchParams.get("sortField") || "createdAt";
+    const sortField = ALLOWED_SORT_FIELDS.includes(requestedSortField)
+      ? requestedSortField
+      : "createdAt";
     const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
     const sort: Record<string, 1 | -1> = { [sortField]: sortOrder };
 

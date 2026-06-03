@@ -30,7 +30,7 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [inLibrary, setInLibrary] = useState<boolean | null>(null);
-  const [status, setStatus] = useState<string>("Unowned");
+  const [status, setStatus] = useState<string>("Not Owned");
 
   useEffect(() => {
   if (!gameId) return;

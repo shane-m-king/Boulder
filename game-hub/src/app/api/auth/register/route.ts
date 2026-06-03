@@ -3,6 +3,7 @@ import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import { z } from "zod";
+import { checkRateLimit, getClientIp, AUTH_RATE_LIMIT } from "@/helpers/rateLimit";
 
 // Zod schema for request body
 const registerSchema = z.object({
@@ -18,6 +19,17 @@ const registerSchema = z.object({
 export const POST = async (request: NextRequest) => {
   try {
     await connect();
+
+    // Rate limit by client IP before doing any auth work
+    const ip = getClientIp(request);
+    const rl = await checkRateLimit(`${ip}:register`, AUTH_RATE_LIMIT);
+    if (rl.limited) {
+      return NextResponse.json(
+        { success: false, error: "Too many registration attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+      );
+    }
+
     const reqBody = await request.json();
 
     // Validate request body using Zod
