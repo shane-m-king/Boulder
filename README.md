@@ -1,7 +1,7 @@
 # Boulder – Game Tracking & Review Hub
 
 **Boulder** is a full-stack web application where gamers can browse, track, and review video games.  
-Built with **Next.js 14**, **TypeScript**, **TailwindCSS**, **MongoDB**, and **JWT authentication**, Boulder lets users manage personal game libraries, write reviews, and explore titles from a centralized database — all in a sleek, responsive interface.
+Built with **Next.js 16**, **React 19**, **TypeScript**, **TailwindCSS**, **MongoDB**, and **JWT authentication**, Boulder lets users manage personal game libraries, write reviews, and explore titles from a centralized database — all in a sleek, responsive interface.
 
 This version of Boulder is a submission to Springboard Software Engineering Bootcamp, and will be updated prior to public launch after more version updates.
 
@@ -21,12 +21,12 @@ This version of Boulder is a submission to Springboard Software Engineering Boot
 
 ## Tech Stack
 
-| Layer             | Technologies                                                                     |
-| ----------------- | -------------------------------------------------------------------------------- |
-| **Frontend**      | Next.js 14 (App Router), TypeScript, TailwindCSS, Framer Motion, React Hot Toast |
-| **Backend / API** | Next.js API Routes, Mongoose, MongoDB Atlas, JWT Auth                            |
-| **Utilities**     | `apiRequest`, `verifyUser`, `toastAction`, `invalidId`                           |
-| **Testing / Dev** | Jest / Supertest, ESLint, Prettier                                               |
+| Layer             | Technologies                                                                                  |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| **Frontend**      | Next.js 16 (App Router), React 19, TypeScript, TailwindCSS, Framer Motion, React Hot Toast, Lucide icons |
+| **Backend / API** | Next.js API Routes, Mongoose, MongoDB Atlas, JWT Auth, bcryptjs, Zod validation               |
+| **Utilities**     | `apiRequest`, `verifyUser`, `toastAction`, `invalidId`                                        |
+| **Testing / Dev** | Jest, Supertest, React Testing Library, MSW, ESLint                                            |
 
 ---
 

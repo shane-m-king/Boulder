@@ -1,3 +1,5 @@
+Original submission to Springboard Bootcamp Software Engineering Career Track:
+
 Springboard Capstone Project Step 1: Initial Project Ideas
 
 This is the very first step in the Capstone Project process for Springboard. Below are some potential ideas to go through
