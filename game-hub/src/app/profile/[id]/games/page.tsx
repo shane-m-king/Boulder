@@ -73,7 +73,8 @@ export const UserGamePage = ({
           apiRequest<UserGameResponse>(
             `/api/users/${userId}/games?page=${page}&limit=10`
           ),
-          apiRequest<ReviewsResponse>(`/api/users/${userId}/reviews`),
+          // limit=100 (API max) — the default of 10 would drop reviews from the map
+          apiRequest<ReviewsResponse>(`/api/users/${userId}/reviews?limit=100`),
         ]);
 
         // Map gameId → review

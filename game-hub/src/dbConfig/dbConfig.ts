@@ -47,7 +47,14 @@ const connect = async (): Promise<typeof mongoose> => {
     cached.promise = connectWithRetry();
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    // Clear the failed promise so the next request can retry the connection
+    // instead of awaiting the same rejected promise forever
+    cached.promise = null;
+    throw err;
+  }
   return cached.conn;
 };
 

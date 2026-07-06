@@ -2,6 +2,9 @@ import { NextRequest } from "next/server";
 import { GET, PATCH, DELETE } from "@/app/api/users/[id]/route";
 import connect from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
+import Game from "@/models/gameModel";
+import UserGame from "@/models/userGameModel";
+import Review from "@/models/reviewModel";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
@@ -243,6 +246,71 @@ describe("/api/users/[id] Route", () => {
 
     const check = await User.findById(userToDelete._id);
     expect(check).toBeNull();
+  });
+
+  it("cascades deletion to the user's library and reviews, and clears the auth cookie", async () => {
+    const userToDelete = await User.create({
+      username: "cascadeuser",
+      email: "cascade@test.com",
+      password: "password123",
+    });
+
+    const game = await Game.create({
+      title: "Cascade Game",
+      summary: "A game for cascade testing",
+      genres: ["RPG"],
+      platforms: ["PC"],
+      thumbnailUrl: "",
+      IGDBid: 999,
+      releaseDate: new Date(),
+    });
+
+    await UserGame.create({
+      user: userToDelete._id,
+      game: game._id,
+      status: "Owned",
+      notes: "Soon to be deleted",
+    });
+
+    await Review.create({
+      user: userToDelete._id,
+      game: game._id,
+      rating: 8,
+      title: "Cascade review",
+      reviewBody: "This review should be removed with the account.",
+    });
+
+    const deleteToken = jwt.sign(
+      {
+        id: userToDelete._id.toString(),
+        username: userToDelete.username,
+        email: userToDelete.email,
+      },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+
+    const req = makeRequest(
+      `http://localhost:3000/api/users/${userToDelete._id}`,
+      "DELETE",
+      undefined,
+      deleteToken
+    );
+    const res = await DELETE(req, {
+      params: Promise.resolve({ id: userToDelete._id.toString() }),
+    });
+
+    expect(res.status).toBe(200);
+
+    // Library entries and reviews are gone with the account
+    expect(await UserGame.countDocuments({ user: userToDelete._id })).toBe(0);
+    expect(await Review.countDocuments({ user: userToDelete._id })).toBe(0);
+
+    // The auth cookie is cleared in the response
+    const setCookie = res.headers.get("set-cookie") || "";
+    expect(setCookie).toContain("token=;");
+
+    await Game.deleteMany({ _id: game._id });
   });
 
   it("rejects delete by another user", async () => {

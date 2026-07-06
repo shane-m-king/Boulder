@@ -14,7 +14,7 @@ export default function HomePage() {
         {/* Description */}
         <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
           Boulder is a full-stack game library and review hub built with{" "}
-          <span className="text-boulder-accent font-medium">Next.js 14</span>,{" "}
+          <span className="text-boulder-accent font-medium">Next.js 16</span>,{" "}
           <span className="text-boulder-accent font-medium">TypeScript</span>,{" "}
           <span className="text-boulder-accent font-medium">TailwindCSS</span>,{" "}
           <span className="text-boulder-accent font-medium">MongoDB</span>, and{" "}
@@ -23,7 +23,7 @@ export default function HomePage() {
           <br />
           Users can securely register, log in, browse games with filters and pagination,
           add titles to personal libraries with custom statuses, and post reviews with ratings.
-          Public profiles let you view other players's collections and feedback.
+          Public profiles let you view other players' collections and feedback.
         </p>
 
         {/* Browse Button */}

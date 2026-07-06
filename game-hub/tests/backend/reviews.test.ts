@@ -99,6 +99,39 @@ describe("/api/reviews Route", () => {
     expect(data.data.review.rating).toBe(9);
   });
 
+  it("rejects a token for a deleted account", async () => {
+    const ghostUser = await User.create({
+      username: "ghostuser",
+      email: "ghost@test.com",
+      password: "password123",
+    });
+    const ghostToken = jwt.sign(
+      { id: ghostUser._id.toString(), username: ghostUser.username, email: ghostUser.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+    await User.deleteOne({ _id: ghostUser._id });
+
+    const req = makeRequest(
+      "http://localhost:3000/api/reviews",
+      "POST",
+      {
+        game: testGame._id.toString(),
+        rating: 5,
+        title: "Ghost review",
+        reviewBody: "Should never be created.",
+      },
+      ghostToken
+    );
+
+    const res = await POST(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(401);
+    expect(data.success).toBe(false);
+    expect(await Review.countDocuments({ user: ghostUser._id })).toBe(0);
+  });
+
   it("fails when missing required fields", async () => {
     const req = makeRequest(
       "http://localhost:3000/api/reviews",

@@ -1,8 +1,14 @@
 import { NextRequest } from "next/server";
 import RateLimit from "@/models/rateLimitModel";
 
-// Shared policy for auth endpoints: 5 attempts per 15 minutes per IP.
+// Fine-grained policy: 5 attempts per 15 minutes. For login this is keyed by
+// IP+username so users behind a shared IP don't pool attempts, and a success
+// against one account can't be used to reset attempts against another.
 export const AUTH_RATE_LIMIT = { max: 5, windowMs: 15 * 60 * 1000 };
+
+// Coarse per-IP backstop for login: catches username enumeration (spreading
+// attempts across many accounts from one IP) without locking out shared IPs.
+export const AUTH_IP_RATE_LIMIT = { max: 20, windowMs: 15 * 60 * 1000 };
 
 interface RateLimitOptions {
   max: number;

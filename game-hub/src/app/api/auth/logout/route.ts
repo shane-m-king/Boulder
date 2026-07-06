@@ -10,6 +10,6 @@ export const POST = async () => {
     return response;
   } catch (error: any) {
     console.error("Error logging out: ", error);
-    return NextResponse.json({ success: false, error: error.message}, {status: 500});
+    return NextResponse.json({ success: false, error: "Failed to log out"}, {status: 500});
   }
 };

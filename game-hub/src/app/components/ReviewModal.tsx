@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/helpers/apiRequest";
 import { toastAction } from "@/helpers/toastAction";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface ReviewModalProps {
   gameId: string;
@@ -18,10 +17,8 @@ interface ReviewModalProps {
 
 
 export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingReview }: ReviewModalProps) => {
-  const { user } = useAuth();
-
   const [title, setTitle] = useState(existingReview?.title || "");
-  const [rating, setRating] = useState<number | "">(existingReview?.rating || "");
+  const [rating, setRating] = useState<number | "">(existingReview ? existingReview.rating : "");
   const [reviewBody, setReviewBody] = useState(existingReview?.body || "");
   const isEditMode = Boolean(existingReview);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -40,9 +37,10 @@ export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingRevi
     e.preventDefault();
     setErrorMessage(null);
 
-    // Validation
-    if (!title.trim() || !reviewBody.trim() || !rating || rating < 0 || rating > 10) {
-      setErrorMessage("Please fill out all fields and provide a valid rating (0-10).");
+    // Validation (rating of 0 is valid, so check for empty string explicitly;
+    // the API only accepts whole-number ratings)
+    if (!title.trim() || !reviewBody.trim() || rating === "" || !Number.isInteger(rating) || rating < 0 || rating > 10) {
+      setErrorMessage("Please fill out all fields and provide a whole-number rating (0-10).");
       return;
     }
 
@@ -52,13 +50,12 @@ export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingRevi
       await toastAction(
         apiRequest(isEditMode ? `/api/reviews/${reviewId}` : `/api/reviews`, {
           method: isEditMode ? "PATCH" : "POST",
+          // The server derives the user from the auth token, so it isn't sent here
           body: isEditMode ? JSON.stringify({
-            user: user?.id,
             title: title.trim(),
             reviewBody: reviewBody.trim(),
             rating,
           }) : JSON.stringify({
-            user: user?.id,
             game: gameId,
             title: title.trim(),
             reviewBody: reviewBody.trim(),
@@ -114,7 +111,7 @@ export const ReviewModal = ({ gameId, reviewId, onClose, onSuccess, existingRevi
               min="0"
               max="10"
               value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
+              onChange={(e) => setRating(e.target.value === "" ? "" : Number(e.target.value))}
               className="w-full bg-boulder-mid/60 border border-boulder-gold/40 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-boulder-gold"
             />
           </div>

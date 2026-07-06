@@ -84,7 +84,7 @@ describe("/api/users/[id]/games Route", () => {
 
     // Add games to user profile
     await UserGame.insertMany([
-      { user: testUser._id, game: testGames[0]._id, status: "Owned" },
+      { user: testUser._id, game: testGames[0]._id, status: "Owned", notes: "My private note" },
       { user: testUser._id, game: testGames[1]._id, status: "Wishlisted" },
       { user: testUser._id, game: testGames[2]._id, status: "Owned" },
     ]);
@@ -175,6 +175,47 @@ describe("/api/users/[id]/games Route", () => {
     expect(res.status).toBe(200);
     expect(data.data.userGames.length).toBe(1);
     expect(data.data.userGames[0].game.title).toBe("Celeste");
+  });
+
+  it("includes notes when the owner views their library", async () => {
+    const req = makeRequest(
+      `http://localhost:3000/api/users/${testUser._id}/games?search=Elden`,
+      "GET",
+      undefined,
+      token
+    );
+    const res = await GET(req, {
+      params: Promise.resolve({ id: testUser._id.toString() }),
+    });
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.data.userGames[0].notes).toBe("My private note");
+  });
+
+  it("omits notes when another user views the library", async () => {
+    const otherToken = jwt.sign(
+      { id: otherUser._id.toString(), username: otherUser.username },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+
+    const req = makeRequest(
+      `http://localhost:3000/api/users/${testUser._id}/games`,
+      "GET",
+      undefined,
+      otherToken
+    );
+    const res = await GET(req, {
+      params: Promise.resolve({ id: testUser._id.toString() }),
+    });
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.data.userGames.length).toBe(3);
+    for (const ug of data.data.userGames) {
+      expect(ug.notes).toBeUndefined();
+    }
   });
 
   it("returns 400 for invalid user ID", async () => {

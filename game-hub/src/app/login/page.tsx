@@ -27,7 +27,7 @@ const LoginPage = () => {
     if (!loading && user) {
       router.push(`/profile/${user.id}`);
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const buttonDisabled = !formData.username || !formData.password;
 

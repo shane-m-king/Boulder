@@ -21,7 +21,7 @@ interface Game {
 interface UserGame {
   _id: string;
   status: string;
-  notes: string;
+  notes?: string; // omitted by the API for non-owners
   updatedAt: string;
   game: Game;
 }
@@ -116,8 +116,10 @@ export const UserGameDetailPage = ({
 
   const fetchExistingReview = async () => {
   try {
+    // Query the game's reviews filtered to this user — an exact lookup,
+    // instead of paging through the user's full review history
     const data = await apiRequest<ReviewsResponse>(
-      `/api/users/${userId}/reviews`,
+      `/api/games/${gameId}/reviews?user=${userId}`,
       { method: "GET" }
     );
 
@@ -254,16 +256,7 @@ export const UserGameDetailPage = ({
                   <strong className="text-boulder-accent">Status:</strong>{" "}
                   {userGame.status}
                 </p>
-                <p>
-                  <strong className="text-boulder-accent">Notes:</strong>{" "}
-                  {userGame.notes ? (
-                    <span className="text-gray-300">{userGame.notes}</span>
-                  ) : (
-                    <span className="italic text-gray-500">
-                      No notes provided.
-                    </span>
-                  )}
-                </p>
+                {/* Notes are private to the library owner, so they aren't shown here */}
               </div>
             )}
           </div>

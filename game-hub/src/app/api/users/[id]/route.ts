@@ -1,5 +1,7 @@
 import connect from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
+import UserGame from "@/models/userGameModel";
+import Review from "@/models/reviewModel";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyUser } from "@/helpers/verifyUser";
 import { invalidId } from "@/helpers/invalidId";
@@ -183,6 +185,13 @@ export const DELETE = async (request: NextRequest, context: { params: Promise<Pa
       );
     }
 
+    // Remove the user's library entries and reviews first, so a partial
+    // failure can't leave orphaned documents pointing at a deleted user
+    await Promise.all([
+      UserGame.deleteMany({ user: params.id }),
+      Review.deleteMany({ user: params.id }),
+    ]);
+
     const deletedUser = await User.findOneAndDelete({ _id: params.id });
 
     if (!deletedUser) {
@@ -193,10 +202,16 @@ export const DELETE = async (request: NextRequest, context: { params: Promise<Pa
       );
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "User deleted successfully"
     }, { status: 200 });
+
+    // The account no longer exists — clear the auth cookie so the client
+    // isn't left holding a token for a deleted user
+    response.cookies.set("token", "", { httpOnly: true, expires: new Date(0) });
+
+    return response;
 
   } catch (error: any) {
     console.error("Error deleting user: ", error);

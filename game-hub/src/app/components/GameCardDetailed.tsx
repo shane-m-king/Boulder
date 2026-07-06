@@ -21,7 +21,7 @@ interface Review {
   title: string;
   rating: number;
   reviewBody: string;
-  user: { username: string };
+  user: { username: string } | null; // null if the reviewer's account is gone
 }
 
 export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
@@ -117,6 +117,7 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
 
   const handleStatusChange = async (newStatus: string) => {
     if (!user || !game) return;
+    const previousStatus = status;
     setStatus(newStatus);
 
     await toastAction(
@@ -127,7 +128,10 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
       {
         loading: "Updating status...",
         success: `Status set to "${newStatus}"`,
-        error: (err) => err.message || "Failed to update status.",
+        error: (err) => {
+          setStatus(previousStatus);
+          return err.message || "Failed to update status.";
+        },
       }
     );
   };
@@ -257,7 +261,7 @@ export const GameCardDetailed = ({ gameId }: { gameId?: string }) => {
               >
                 <div className="flex justify-between items-center mb-2">
                   <p className="font-semibold text-boulder-gold">
-                    {r.user.username}
+                    {r.user?.username ?? "Deleted user"}
                   </p>
                   <p className="text-sm text-gray-400">⭐ {r.rating}/10</p>
                 </div>

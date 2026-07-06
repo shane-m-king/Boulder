@@ -18,8 +18,10 @@ export const GET = async (request: NextRequest) => {
 
     const match: Record<string, any> = {};
 
+    // Genre values come from a fixed dropdown of IGDB names, so an exact
+    // match is safe and lets MongoDB use the genres index (regex can't)
     if (genre) {
-      match.genres = { $regex: escapeRegex(genre), $options: "i" };
+      match.genres = genre;
     }
 
     if (platform) {
@@ -79,16 +81,17 @@ export const GET = async (request: NextRequest) => {
       pipeline.push({ $sort: { IGDBratingCount: -1, title: 1 } });
     }
 
-    // Pagination
-    pipeline.push({ $skip: skip });
-    pipeline.push({ $limit: limit });
+    // Page slice and total count in a single round trip
+    pipeline.push({
+      $facet: {
+        games: [{ $skip: skip }, { $limit: limit }],
+        totalCount: [{ $count: "count" }],
+      },
+    });
 
-    // Execute pipeline
-    const games = await Game.aggregate(pipeline);
-
-    // Get total count (include search filter so pagination matches results)
-    const countMatch = search ? { ...match, title: searchRegex } : match;
-    const totalGames = await Game.countDocuments(countMatch);
+    const [result] = await Game.aggregate(pipeline);
+    const games = result.games;
+    const totalGames = result.totalCount[0]?.count ?? 0;
     const totalPages = Math.ceil(totalGames / limit);
 
     return NextResponse.json(

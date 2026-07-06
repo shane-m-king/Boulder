@@ -51,9 +51,9 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      router.push("/profile");
+      router.push(`/profile/${user.id}`);
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
   const buttonDisabled =
     !formData.email || !formData.username || !formData.password;

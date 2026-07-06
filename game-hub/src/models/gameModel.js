@@ -32,8 +32,6 @@ const gameSchema = new Schema(
     },
     IGDBid: {
       type: Number,
-      unique: true,
-      index: true,
       default: null,
     },
     IGDBrating: {
@@ -62,6 +60,12 @@ gameSchema.index({ title: 1 });
 gameSchema.index({ IGDBratingCount: -1, title: 1, _id: 1 });
 gameSchema.index({ genres: 1 });
 gameSchema.index({ platforms: 1 });
+// Unique only for real IGDB ids: the partial filter skips null/missing values,
+// so games created without an IGDB id don't collide on the unique index
+gameSchema.index(
+  { IGDBid: 1 },
+  { unique: true, partialFilterExpression: { IGDBid: { $type: "number" } } }
+);
 
 const Game = models.Game || model("Game", gameSchema);
 

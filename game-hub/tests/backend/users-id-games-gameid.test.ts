@@ -105,6 +105,34 @@ describe("/api/users/[id]/games/[gameId] Route", () => {
     expect(data.data.userGame.status).toBe("Owned");
     expect(data.data.userGame.user.username).toBe("userOne");
     expect(data.data.userGame.game.title).toBe("Hollow Knight");
+    // Owner sees their own notes
+    expect(data.data.userGame.notes).toBe("Love this one");
+  });
+
+  it("omits notes when another user views the game entry", async () => {
+    const otherToken = jwt.sign(
+      { id: otherUser._id.toString(), username: otherUser.username },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+
+    const req = makeRequest(
+      `http://localhost:3000/api/users/${testUser._id}/games/${testGame._id}`,
+      "GET",
+      undefined,
+      otherToken
+    );
+    const res = await GET(req, {
+      params: Promise.resolve({
+        id: testUser._id.toString(),
+        gameId: testGame._id.toString(),
+      }),
+    });
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.data.userGame.status).toBe("Owned");
+    expect(data.data.userGame.notes).toBeUndefined();
   });
 
   it("returns 404 if game not found in user profile", async () => {

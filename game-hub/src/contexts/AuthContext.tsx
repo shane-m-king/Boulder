@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatRetryAfter } from "@/helpers/retryAfter";
 
@@ -25,21 +25,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // Fetch the current user from the auth cookie (shared by the initial
+  // load and refreshUser)
+  const fetchUser = useCallback(async () => {
+    const res = await fetch("/api/auth/verify", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setUser(data.data.user);
+    } else {
+      setUser(null);
+    }
+  }, []);
+
   // Load user from cookie
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const res = await fetch("/api/auth/verify", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.data.user);
-        } else {
-          setUser(null);
-        }
+        await fetchUser();
       } catch (error) {
         console.error("Error verifying user:", error);
         setUser(null);
@@ -49,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     loadUser();
-  }, []);
+  }, [fetchUser]);
 
 // Login
 const login = async (username: string, password: string) => {
@@ -73,8 +79,9 @@ const login = async (username: string, password: string) => {
       throw new Error(data.error || "Login failed");
     }
 
+    // Navigation is left to the calling page (login/register redirect
+    // straight to /profile/{id} once user state is set)
     setUser(data.data);
-    router.push("/profile");
   } catch (error: any) {
     console.error("Login failed:", error);
     throw error;
@@ -99,20 +106,11 @@ const login = async (username: string, password: string) => {
     }
   };
 
-  // Refresh user
+  // Refresh user (network errors keep the current user rather than
+  // logging out on a blip)
   const refreshUser = async () => {
     try {
-      const res = await fetch("/api/auth/verify", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.data.user);
-      } else {
-        setUser(null);
-      }
+      await fetchUser();
     } catch (error) {
       console.error("Error refreshing user:", error);
     }

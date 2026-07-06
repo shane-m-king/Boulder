@@ -3,20 +3,22 @@ import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { checkRateLimit, getClientIp, AUTH_RATE_LIMIT } from "@/helpers/rateLimit";
+import { checkRateLimit, getClientIp, AUTH_RATE_LIMIT, AUTH_IP_RATE_LIMIT } from "@/helpers/rateLimit";
 
 
 export const POST = async (request: NextRequest) => {
   try {
     await connect();
 
-    // Rate limit by client IP before doing any auth work
     const ip = getClientIp(request);
-    const rl = await checkRateLimit(`${ip}:login`, AUTH_RATE_LIMIT);
-    if (rl.limited) {
+
+    // Coarse per-IP backstop before doing any auth work (catches username
+    // enumeration across many accounts from a single IP)
+    const ipLimit = await checkRateLimit(`${ip}:login`, AUTH_IP_RATE_LIMIT);
+    if (ipLimit.limited) {
       return NextResponse.json(
         { success: false, error: "Too many login attempts. Please try again later." },
-        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+        { status: 429, headers: { "Retry-After": String(ipLimit.retryAfter) } }
       );
     }
 
@@ -24,7 +26,7 @@ export const POST = async (request: NextRequest) => {
     const { username, password } = reqBody;
 
     // Check for username and password
-    if (!username || !password) {
+    if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
       return NextResponse.json(
         { success: false, error: "Username and password are required" },
         { status: 400 }
@@ -32,6 +34,19 @@ export const POST = async (request: NextRequest) => {
     }
 
     const trimmedUsername = username.trim().toLowerCase();
+
+    // Fine-grained limit keyed by IP+account, so users behind a shared IP
+    // don't pool attempts (key length capped: login accepts arbitrary input)
+    const accountLimit = await checkRateLimit(
+      `${ip}:${trimmedUsername.slice(0, 64)}:login`,
+      AUTH_RATE_LIMIT
+    );
+    if (accountLimit.limited) {
+      return NextResponse.json(
+        { success: false, error: "Too many login attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(accountLimit.retryAfter) } }
+      );
+    }
 
     // Generic credential error avoids revealing which usernames exist
     const invalidCredentials = NextResponse.json(
@@ -80,6 +95,6 @@ export const POST = async (request: NextRequest) => {
         
   } catch (error: any) {
     console.error("Error logging in: ", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Failed to log in" }, { status: 500 });
   }
 };

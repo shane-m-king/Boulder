@@ -1,6 +1,8 @@
 import connect from "@/dbConfig/dbConfig";
 import { NextRequest, NextResponse } from "next/server";
 import Review from "@/models/reviewModel";
+import Game from "@/models/gameModel";
+import User from "@/models/userModel";
 import { verifyUser } from "@/helpers/verifyUser";
 import { invalidId } from "@/helpers/invalidId";
 
@@ -26,6 +28,17 @@ export const POST = async (request: NextRequest) => {
     // Verify token and get user data - return response on failure
     const userData = verifyUser(request);
     if (userData instanceof NextResponse) return userData;
+
+    // Reject tokens for accounts that no longer exist (a JWT stays valid for
+    // up to 24h after the account is deleted)
+    const userExists = await User.exists({ _id: userData.id });
+    if (!userExists) {
+      console.error("Token references a deleted account");
+      return NextResponse.json(
+        { success: false, error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
 
     const body = await request.json();
     const { game, rating, title, reviewBody } = body;
@@ -67,6 +80,16 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json(
         { success: false, error: "Review body maximum 400 characters" },
         { status: 400 }
+      );
+    }
+
+    // Ensure the game exists before attaching a review to it
+    const gameExists = await Game.exists({ _id: game });
+    if (!gameExists) {
+      console.error("Game not found");
+      return NextResponse.json(
+        { success: false, error: "Game not found." },
+        { status: 404 }
       );
     }
 

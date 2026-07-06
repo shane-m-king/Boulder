@@ -50,8 +50,8 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ success: false, error: "Username already exists" }, { status: 400 });
     }
 
-    // Hash password
-    const hashedPassword = await bcryptjs.hash(password, await bcryptjs.genSalt(10));
+    // Hash password (bcryptjs generates the salt internally from the rounds count)
+    const hashedPassword = await bcryptjs.hash(password, 10);
 
     // Save user
     const newUser = new User({ email: normalizedEmail, username: trimmedUsername, password: hashedPassword });
@@ -75,6 +75,6 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ success: false, error: errors }, { status: 400 });
     }
     console.error("Error registering user: ", error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Failed to register user" }, { status: 500 });
   }
 };

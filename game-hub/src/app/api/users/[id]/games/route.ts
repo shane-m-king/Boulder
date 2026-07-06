@@ -1,10 +1,14 @@
 import connect from "@/dbConfig/dbConfig";
 import UserGame from "@/models/userGameModel";
+import Game from "@/models/gameModel";
+import User from "@/models/userModel";
+import { Types, PipelineStage } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { invalidId } from "@/helpers/invalidId";
 import { verifyUser } from "@/helpers/verifyUser";
 import { escapeRegex } from "@/helpers/escapeRegex";
 import { getPagination } from "@/helpers/pagination";
+import { STATUSES } from "@/constants/statuses";
 
 interface Params {
   id: string;
@@ -44,31 +48,58 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
     const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
     const sort: Record<string, 1 | -1> = { [sortField]: sortOrder };
 
-    // Fetch all user games
-    const userGamesRaw = await UserGame.find({ user: params.id })
-      .populate("game", "-__v -createdAt -updatedAt")
-      .sort(sort);
+    // Filter, sort, and paginate in the database instead of loading the
+    // whole library into memory
+    const match: Record<string, unknown> = { user: new Types.ObjectId(params.id) };
+    if (statusFilter) match.status = statusFilter;
 
-    // Apply in-memory filtering for game categories
-    let filteredGames = userGamesRaw;
-
-    if (statusFilter) {
-      filteredGames = filteredGames.filter(usergame => usergame.status === statusFilter);
-    }
+    const pipeline: PipelineStage[] = [
+      { $match: match },
+      {
+        $lookup: {
+          from: Game.collection.name,
+          localField: "game",
+          foreignField: "_id",
+          as: "game",
+        },
+      },
+      { $unwind: "$game" },
+    ];
 
     if (search) {
       const regex = new RegExp(escapeRegex(search), "i");
-      filteredGames = filteredGames.filter(usergame =>
-        regex.test(usergame.game.title) ||
-        usergame.game.genres?.some((g: string) => regex.test(g)) ||
-        usergame.game.platforms?.some((p: string) => regex.test(p))
-      );
+      pipeline.push({
+        $match: {
+          $or: [
+            { "game.title": regex },
+            { "game.genres": regex },
+            { "game.platforms": regex },
+          ],
+        },
+      });
     }
 
-    // Pagination after filtering
-    const totalGames = filteredGames.length;
+    // Mirror populate("game", "-__v -createdAt -updatedAt")
+    pipeline.push({ $unset: ["game.__v", "game.createdAt", "game.updatedAt"] });
+
+    // Notes are private to the library owner
+    if (userData.id !== params.id) {
+      pipeline.push({ $unset: "notes" });
+    }
+
+    // _id tie-break keeps pagination stable when sort values are equal
+    pipeline.push({ $sort: { ...sort, _id: 1 } });
+    pipeline.push({
+      $facet: {
+        userGames: [{ $skip: skip }, { $limit: limit }],
+        totalCount: [{ $count: "count" }],
+      },
+    });
+
+    const [result] = await UserGame.aggregate(pipeline);
+    const paginatedGames = result.userGames;
+    const totalGames = result.totalCount[0]?.count ?? 0;
     const totalPages = Math.ceil(totalGames / limit);
-    const paginatedGames = filteredGames.slice(skip, skip + limit);
 
     return NextResponse.json({
       success: true,
@@ -105,6 +136,17 @@ export const POST = async (request: NextRequest, context: { params: Promise<Para
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 });
     }
 
+    // Reject tokens for accounts that no longer exist (a JWT stays valid for
+    // up to 24h after the account is deleted)
+    const userExists = await User.exists({ _id: userData.id });
+    if (!userExists) {
+      console.error("Token references a deleted account");
+      return NextResponse.json(
+        { success: false, error: "Invalid or expired token" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { game, status, notes } = body;
 
@@ -122,6 +164,16 @@ export const POST = async (request: NextRequest, context: { params: Promise<Para
     if (existing) {
       console.error("Game already added");
       return NextResponse.json({ success: false, error: "Game already added to user profile" }, { status: 409 });
+    }
+
+    // Validate status (matches the PATCH handler; otherwise Mongoose enum
+    // validation would throw and surface as a 500)
+    if (status !== undefined && !STATUSES.includes(status)) {
+      console.error("Invalid status");
+      return NextResponse.json(
+        { success: false, error: "Invalid status" },
+        { status: 400 }
+      );
     }
 
     // Validate notes length

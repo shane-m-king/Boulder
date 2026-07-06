@@ -45,13 +45,19 @@ export const GET = async (request: NextRequest, context: { params: Promise<Param
     const populatedUserGame = await userGame.populate([
       { path: "user", select: "username" },
       { path: "game", select: "title genres platforms thumbnailUrl" }
-    ]);     
+    ]);
+
+    // Notes are private to the library owner
+    const responseUserGame = populatedUserGame.toObject();
+    if (userData.id !== params.id) {
+      delete responseUserGame.notes;
+    }
 
     return NextResponse.json({
       success: true,
       message: "Game retrieved successfully",
       data: {
-        userGame: populatedUserGame
+        userGame: responseUserGame
       },
     }, { status: 200 });
 
